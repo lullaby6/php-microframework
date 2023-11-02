@@ -1,6 +1,6 @@
 <?php
 
-function generate_jwt($payload = array(), $secret_key = "secret_key", $exp = 3600) {
+function generate_jwt($payload = [], $secret_key = "secret_key", $exp = 3600) {
     $header = [
         'alg' => 'HS256',
         'typ' => 'JWT'

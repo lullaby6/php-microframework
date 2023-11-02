@@ -6,7 +6,7 @@ function router($dir_path, $request_prefix = "") {
 
         if (str_contains($REQUEST_URL, '?')) $REQUEST_URL = explode('?', $REQUEST_URL)[0];
 
-        $extensions = array(".php", ".html", "/index.php", "/index.html", "index.php", "index.html");
+        $extensions = [".php", ".html", "/index.php", "/index.html", "index.php", "index.html"];
 
         $error_path = $dir_path . "/404.php";
 
