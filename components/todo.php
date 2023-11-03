@@ -1,1 +1,1 @@
-<h2> <?php echo $todo; ?></h2>
+<h2> <?php echo $todo; ?> </h2>
