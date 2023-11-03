@@ -20,6 +20,8 @@ You can access the environment variables of the file ```".env"``` by calling the
 APP_NAME="MY_APP_NAME"
 ```
 
+php example:
+
 ```php
 include_once ROOT_PATH . "/utilities/env.php";
 
