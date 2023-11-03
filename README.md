@@ -16,7 +16,7 @@ This is a simple Object-Relational Mapping (ORM) class for performing common dat
 
 ### How to Use
 
-### 1. Initialize the Database
+#### 1. Initialize the Database
 
 First, create an instance of the `Database` class by providing the necessary database connection details:
 
