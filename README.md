@@ -24,7 +24,7 @@ $db = new Database('mysql', 'localhost', 'my_database', 'username', 'password');
 
 ### 2. Creating Tables
 
-To create a table, you can use the `createTable` method. Provide the table name and an array of column definitions:
+To create a table, you can use the `users_table` method. Provide the table name and an array of column definitions:
 
 ```php
 $users_table = [
@@ -35,15 +35,15 @@ $users_table = [
         'email' => 'VARCHAR(100)'
     ]
 ];
-$result = $db->createTable($users_table['name'], $users_table['columns']);
+$result = $db->create_table($users_table['name'], $users_table['columns']);
 ```
 
 ### 3. Deleting Tables
 
-You can delete a table if it exists using the `deleteTable` method by providing the table name:
+You can delete a table if it exists using the `delete_table` method by providing the table name:
 
 ```php
-$result = $db->deleteTable('users');
+$result = $db->delete_table('users');
 ```
 
 ### 4. Running SQL Queries
