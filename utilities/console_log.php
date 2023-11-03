@@ -1,6 +1,6 @@
 <?php
 
-function log($msg) {
+function console_log($msg) {
     echo '<script>console.log("' . $msg . '");</script>';
 }
 
