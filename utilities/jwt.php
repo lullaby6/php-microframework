@@ -39,7 +39,8 @@ function verify_jwt($jwt, $secret_key = "secret_key"){
     if (empty($header['alg']) || $header['alg'] !== 'HS256') return false;
 
     $expectedSignature = hash_hmac('sha256', "$base64Header.$base64Payload", $secret_key);
-    if ($signature !== $expectedSignature) return false;
+    // if ($signature !== $expectedSignature) return false;
+    if (!hash_equals($signature, $expectedSignature)) return false;
 
     if (isset($payload['exp']) && $payload['exp'] < time()) return false;
 

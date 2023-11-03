@@ -5,6 +5,12 @@ function router($dir_path, $only_index_files = true, $default_page = "404.php") 
         $REQUEST_URL = $_SERVER['REQUEST_URI'];
 
         if (str_contains($REQUEST_URL, '?')) $REQUEST_URL = explode('?', $REQUEST_URL)[0];
+        if (str_contains($REQUEST_URL, '.')) {
+            $request_url_parts = explode('.', $REQUEST_URL);
+            print_r($request_url_parts);
+            $request_url_file_type = $request_url_parts[count($request_url_parts) - 1];
+            echo "<br>$request_url_file_type<br>";
+        }
 
         $default_page = $dir_path . "/" . $default_page;
 
