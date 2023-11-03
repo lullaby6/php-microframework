@@ -1,6 +1,6 @@
 <?php
 
-$env_file_path = BASE_PATH . "/.env";
+$env_file_path = $_SERVER["DOCUMENT_ROOT"] . "/.env";
 
 if (file_exists($env_file_path)) {
     $env_content = file_get_contents($env_file_path);

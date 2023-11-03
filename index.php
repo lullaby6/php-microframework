@@ -1,9 +1,8 @@
 <?php
 
-include_once __DIR__ . "/config.php";
-include_once BASE_PATH . "/utilities/data.php";
-include_once BASE_PATH . "/utilities/env.php";
-include_once BASE_PATH . "/utilities/router.php";
-router(BASE_PATH . "/pages", "framework/");
+include_once $_SERVER["DOCUMENT_ROOT"] . "/utilities/data.php";
+include_once $_SERVER["DOCUMENT_ROOT"] . "/utilities/env.php";
+include_once $_SERVER["DOCUMENT_ROOT"] . "/utilities/router.php";
+router($_SERVER["DOCUMENT_ROOT"] . "/pages");
 
 ?>
