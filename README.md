@@ -10,7 +10,23 @@ By default the router only redirects to the index.php of the request url, but yo
 router('./pages', false)
 ```
 
-## Database
+## Environment Variables
+
+You can access the environment variables of the file ```".env"``` by calling the file ```"env.php"``` in ```"utilities"```, the environment variables will be stored in ```$_ENV```
+
+.env file:
+
+```yml
+APP_NAME="MY_APP_NAME"
+```
+
+```php
+include_once ROOT_PATH . "/utilities/env.php";
+
+echo $_ENV['APP_NAME'];
+```
+
+## Database ORM
 
 This is a simple Object-Relational Mapping (ORM) class for performing common database operations using PHP and PDO. The class provides methods for database connection, creating tables, dropping tables, executing SQL queries, and performing CRUD (Create, Read, Update, Delete) operations on data.
 
