@@ -55,13 +55,13 @@ $sql = "SELECT * FROM users";
 $users = $db->query($sql);
 ```
 
-### 5. Running Parametrized Queries
+### 5. Running Parametrized Queries and Prevent SQL Injection
 
 You can execute parametrized SQL queries using the `execute` method. It takes the SQL query and an array of parameters as inputs:
 
 ```php
 $sql = 'SELECT * FROM users WHERE id > :id';
-$users = $db->query($sql, [':id' => 1]);
+$users = $db->execute($sql, [':id' => 1]);
 ```
 
 ### 6. Selecting Data
