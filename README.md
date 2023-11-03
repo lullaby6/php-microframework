@@ -107,6 +107,3 @@ Don't forget to close the database connection when you're done:
 ```php
 $db->close();
 ```
-
-That's it! This simple PHP ORM provides basic database operations for your application.
-```
