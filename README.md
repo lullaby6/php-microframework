@@ -34,9 +34,9 @@ include_once ROOT_PATH . "/utilities/env.php";
 echo $_ENV['APP_NAME'];
 ```
 
-## Database ORM
+## Database
 
-This is a simple Object-Relational Mapping (ORM) class for performing common database operations using PHP and PDO. The class provides methods for database connection, creating tables, dropping tables, executing SQL queries, and performing CRUD (Create, Read, Update, Delete) operations on data.
+This is a simple Database class for performing common database operations using PHP and PDO. The class provides methods for database connection, creating tables, dropping tables, executing SQL queries, and performing CRUD (Create, Read, Update, Delete) operations on data.
 
 ### How to Use
 
