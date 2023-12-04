@@ -95,9 +95,6 @@ class Database {
 
         $sql .=  ($extra ? " $extra" : '') . ($limit ? " LIMIT $limit" : '') . ';';
 
-        echo $sql;
-        echo print_r($params);
-
         $stmt = $this->execute($sql, $params);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
