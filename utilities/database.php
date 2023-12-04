@@ -48,10 +48,9 @@ class Database {
         }
     }
 
-    function create_table($table_name, $columns) {
-        if (empty($table_name) || empty($columns)) {
-            throw new Exception('Table name and columns are required.');
-        }
+    function create_table($table_info) {
+        $table_name = $table_info['table_name'];
+        $columns = $table_info['columns'];
 
         $sql = "CREATE TABLE IF NOT EXISTS $table_name (";
         $column_definitions = [];

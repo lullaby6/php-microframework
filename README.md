@@ -59,16 +59,14 @@ $db = new Database([
 To create a table, you can use the `users_table` method. Provide the table name and an array of column definitions:
 
 ```php
-$users_table = [
-    'name' => 'users',
+$result = $db->create_table([
+    'table_name' => 'users',
     'columns' => [
         'id' => 'INT AUTO_INCREMENT PRIMARY KEY',
         'name' => 'VARCHAR(50)',
         'email' => 'VARCHAR(100)'
     ]
-];
-
-$result = $db->create_table($users_table['name'], $users_table['columns']);
+]);
 ```
 
 ### Deleting Tables
