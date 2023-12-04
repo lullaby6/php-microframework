@@ -76,19 +76,27 @@ class Database {
         }
     }
 
-    function select($table, $conditions = [], $columns = ['*'], $limit = null) {
-        $sql = "SELECT " . implode(", ", $columns) . " FROM $table" . ($limit ? " LIMIT $limit" : '');
+    function select($table, $conditions = [], $columns = '*', $limit = null, $extra = null) {
+        $sql = "SELECT " . $columns . " FROM $table";
         $params = [];
 
         if (!empty($conditions)) {
             $sql .= " WHERE ";
             $where = [];
-            foreach ($conditions as $column => $value) {
-                $where[] = "$column = :$column";
-                $params[":$column"] = $value;
+
+            foreach ($conditions as $index=>$condition) {
+                list($column, $operator, $value) = $condition;
+                $where[] = "$column $operator :$index";
+                $params[":$index"] = $value;
             }
+
             $sql .= implode(" AND ", $where);
         }
+
+        $sql .= ($limit ? " LIMIT $limit" : '') . ($extra ? " $extra" : '') . ';';
+
+        echo $sql;
+        echo print_r($params);
 
         $stmt = $this->execute($sql, $params);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -120,10 +128,13 @@ class Database {
         if (!empty($conditions)) {
             $sql .= " WHERE ";
             $where = [];
-            foreach ($conditions as $column => $value) {
-                $where[] = "$column = :$column";
-                $params[":$column"] = $value;
+
+            foreach ($conditions as $index=>$condition) {
+                list($column, $operator, $value) = $condition;
+                $where[] = "$column $operator :$index";
+                $params[":$index"] = $value;
             }
+
             $sql .= implode(" AND ", $where);
         }
 
@@ -135,9 +146,17 @@ class Database {
         $where = [];
         $params = [];
 
-        foreach ($conditions as $column => $value) {
-            $where[] = "$column = :$column";
-            $params[":$column"] = $value;
+        if (!empty($conditions)) {
+            $sql .= " WHERE ";
+            $where = [];
+
+            foreach ($conditions as $index=>$condition) {
+                list($column, $operator, $value) = $condition;
+                $where[] = "$column $operator :$index";
+                $params[":$index"] = $value;
+            }
+
+            $sql .= implode(" AND ", $where);
         }
 
         $sql .= implode(" AND ", $where);
@@ -189,7 +208,7 @@ class Database {
 // }
 
 // select
-// $conditions = ['id' => 1];
+// $conditions = [['id', '=', 1]];
 // $users = $db->select('users', $conditions);
 
 // foreach ($users as $user) {
@@ -206,7 +225,7 @@ class Database {
 
 // update:
 // $data = ['email' => 'lucianobrumer5@gmail.com2'];
-// $conditions = ['id' => 1];
+// $conditions = [['id', '=', 1]];
 // $user_updated = $db->update('users', $data, $conditions);
 
 // if ($user_updated) {
