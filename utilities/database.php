@@ -93,7 +93,7 @@ class Database {
             $sql .= implode(" AND ", $where);
         }
 
-        $sql .= ($limit ? " LIMIT $limit" : '') . ($extra ? " $extra" : '') . ';';
+        $sql .=  ($extra ? " $extra" : '') . ($limit ? " LIMIT $limit" : '') . ';';
 
         echo $sql;
         echo print_r($params);
