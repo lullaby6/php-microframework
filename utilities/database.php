@@ -1,16 +1,27 @@
 <?php
 
 class Database {
+    public $driver;
+    public $host;
+    public $database;
+    public $username;
+    public $password;
     private $connection = null;
 
-    function __construct($db_type, $db_host, $db_name, $db_user, $db_pass) {
-        $this->connect($db_type, $db_host, $db_name, $db_user, $db_pass);
+    function __construct($db) {
+        $this->driver = $db['driver'];
+        $this->host = $db['host'];
+        $this->database = $db['database'];
+        $this->username = $db['username'];
+        $this->password = $db['password'];
+
+        $this->connect();
     }
 
-    function connect($db_type, $db_host, $db_name, $db_user, $db_pass) {
+    function connect($db) {
         try {
-            $dsn = "$db_type:host=$db_host;dbname=$db_name";
-            $this->connection = new PDO($dsn, $db_user, $db_pass);
+            $dsn = "$this->driver:host=$this->host;dbname=$this->database";
+            $this->connection = new PDO($dsn, $this->username, $this->password);
             $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $e) {
             throw new Exception('Failed to connect to the database: ' . $e->getMessage());
@@ -49,8 +60,7 @@ class Database {
             $column_definitions[] = "$column_name $definition";
         }
 
-        $sql .= implode(", ", $column_definitions);
-        $sql .= ")";
+        $sql .= implode(", ", $column_definitions) . ")";
 
         try {
             $stmt = $this->connection->prepare($sql);
@@ -165,75 +175,5 @@ class Database {
         $this->connection = null;
     }
 }
-
-// example:
-// $db = new Database('mysql', 'localhost', 'my_database', 'username', 'password');
-
-// create_table:
-// $users_table = [
-//     'name' => 'users',
-//     'columns' => [
-//         'id' => 'INT AUTO_INCREMENT PRIMARY KEY',
-//         'name' => 'VARCHAR(50)',
-//         'email' => 'VARCHAR(100)'
-//     ]
-// ];
-// $result = $db->create_table($users_table['name'], $users_table['columns']);
-// if ($result) {
-//     echo $users_table['name'] . " created successfully.";
-// }
-
-
-// delete_table:
-// $result = $db->delete_table('users');
-
-// query:
-// $sql = "SELECT * FROM users";
-// $users = $db->query($sql);
-// if ($users) {
-//     foreach ($users as $user) {
-//         echo "name: {$user['name']}, email: {$user['email']}<br>";
-//     }
-// }
-
-// execute:
-// $sql = 'SELECT * FROM users WHERE id > :id';
-// $users = $db->query($sql, [':id' => 1]);
-
-// foreach ($users as $user) {
-//     // Procesar los resultados
-// }
-
-// select
-// $conditions = [['id', '=', 1]];
-// $users = $db->select('users', $conditions);
-
-// foreach ($users as $user) {
-//     echo "name: {$user['name']}, email: {$user['email']}<br>";
-// }
-
-// create:
-// $user = ['name' => 'Lullaby', 'email' => 'lucianobrumer5@gmail.com'];
-// $new_user_id = $db->create('users', $user);
-
-// if ($new_user_id) {
-//     echo "new user inserted with ID: $new_user_id";
-// }
-
-// update:
-// $data = ['email' => 'lucianobrumer5@gmail.com2'];
-// $conditions = [['id', '=', 1]];
-// $user_updated = $db->update('users', $data, $conditions);
-
-// if ($user_updated) {
-//     echo "user updated successfully.";
-// }
-
-// delete:
-// $user_deleted = $db->delete('users', ['id' => 2]);
-
-// if ($user_deleted) {
-//     echo "user deleted successfully.";
-// }
 
 ?>
