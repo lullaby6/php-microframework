@@ -8,17 +8,17 @@ class Database {
     public $password;
     private $connection = null;
 
-    function __construct($db) {
-        $this->driver = $db['driver'];
-        $this->host = $db['host'];
-        $this->database = $db['database'];
-        $this->username = $db['username'];
-        $this->password = $db['password'];
+    function __construct($db_info) {
+        $this->driver = $db_info['driver'];
+        $this->host = $db_info['host'];
+        $this->database = $db_info['database'];
+        $this->username = $db_info['username'];
+        $this->password = $db_info['password'];
 
         $this->connect();
     }
 
-    function connect($db) {
+    function connect() {
         try {
             $dsn = "$this->driver:host=$this->host;dbname=$this->database";
             $this->connection = new PDO($dsn, $this->username, $this->password);
@@ -86,8 +86,13 @@ class Database {
         }
     }
 
-    function select($table, $conditions = [], $columns = '*', $limit = null, $extra = null) {
-        $sql = "SELECT " . $columns . " FROM $table";
+    function select($query_info) {
+        $table_name = $query_info['table_name'];
+        $conditions = $query_info['conditions'];
+        $columns = $query_info['columns'];
+        $limit = $query_info['limit'];
+
+        $sql = "SELECT " . $columns . " FROM $table_name";
         $params = [];
 
         if (!empty($conditions)) {
@@ -103,7 +108,10 @@ class Database {
             $sql .= implode(" AND ", $where);
         }
 
-        $sql .=  ($extra ? " $extra" : '') . ($limit ? " LIMIT $limit" : '') . ';';
+        if (!empty($limit)) {
+            $sql .= " LIMIT $limit";
+        }
+
 
         $stmt = $this->execute($sql, $params);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
