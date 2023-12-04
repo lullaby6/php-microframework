@@ -95,7 +95,7 @@ $users = $db->execute($sql, [':id' => 1]);
 You can retrieve data from a table using the `select` method. Provide the table name and optional conditions:
 
 ```php
-$conditions = ['id' => 1];
+$conditions = [['id', '=' ,1]];
 $users = $db->select('users', $conditions);
 ```
 
@@ -114,7 +114,7 @@ You can update data in a table using the `update` method. Provide the table name
 
 ```php
 $data = ['email' => 'lucianobrumer5@gmail.com2'];
-$conditions = ['id' => 1];
+$conditions = [['id', '=' ,1]];
 $user_updated = $db->update('users', $data, $conditions);
 ```
 
