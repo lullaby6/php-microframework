@@ -88,9 +88,21 @@ class Database {
 
     function select($query_info) {
         $table_name = $query_info['table_name'];
-        $conditions = $query_info['conditions'];
-        $columns = $query_info['columns'];
-        $limit = $query_info['limit'];
+        $conditions;
+        $columns = "*";
+        $limit;
+
+        if (isset($query_info['conditions'])) {
+            $conditions = $query_info['conditions'];
+        }
+
+        if (isset($query_info['columns'])) {
+            $columns = $query_info['columns'];
+        }
+
+        if (isset($query_info['limit'])) {
+            $limit = $query_info['limit'];
+        }
 
         $sql = "SELECT " . $columns . " FROM $table_name";
         $params = [];
@@ -117,10 +129,13 @@ class Database {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    function create($table, $data) {
+    function create($query_info) {
+        $table_name = $query_info['table_name'];
+        $data = $query_info['data'];
+
         $columns = implode(", ", array_keys($data));
         $values = ":" . implode(", :", array_keys($data));
-        $sql = "INSERT INTO $table ($columns) VALUES ($values)";
+        $sql = "INSERT INTO $table_name ($columns) VALUES ($values)";
         $params = [];
         foreach ($data as $key => $value) {
             $params[":$key"] = $value;
@@ -130,7 +145,15 @@ class Database {
         return $this->connection->lastInsertId();
     }
 
-    function update($table, $data, $conditions) {
+    function update($query_info) {
+        $table_name = $query_info['table_name'];
+        $data = $query_info['data'];
+        $conditions;
+
+        if (isset($query_info['conditions'])) {
+            $conditions = $query_info['conditions'];
+        }
+
         $set = [];
         $params = $data;
 
@@ -138,7 +161,7 @@ class Database {
             $set[] = "$column = :$column";
         }
 
-        $sql = "UPDATE $table SET " . implode(", ", $set);
+        $sql = "UPDATE $table_name SET " . implode(", ", $set);
 
         if (!empty($conditions)) {
             $sql .= " WHERE ";
@@ -156,7 +179,14 @@ class Database {
         return $this->execute($sql, $params);
     }
 
-    function delete($table, $conditions) {
+    function delete($query_info) {
+        $table_name = $query_info['table_name'];
+        $conditions;
+
+        if (isset($query_info['conditions'])) {
+            $conditions = $query_info['conditions'];
+        }
+
         $sql = "DELETE FROM $table WHERE ";
         $where = [];
         $params = [];
