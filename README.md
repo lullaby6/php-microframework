@@ -115,8 +115,7 @@ $users = $db->select([
 To insert a new record, use the `create` method with the table name and an array of data:
 
 ```php
-$user = ;
-$new_user_id = $db->create([
+$new_user = $db->create([
     'table_name' => 'users',
     'data' => ['name' => 'Lullaby', 'email' => 'lucianobrumer5@gmail.com']
 ]);
