@@ -76,8 +76,8 @@ class Database {
         }
     }
 
-    function select($table, $conditions = [], $columns = ['*']) {
-        $sql = "SELECT " . implode(", ", $columns) . " FROM $table";
+    function select($table, $conditions = [], $columns = ['*'], $limit = null) {
+        $sql = "SELECT " . implode(", ", $columns) . " FROM $table" . ($limit ? " LIMIT $limit" : '');
         $params = [];
 
         if (!empty($conditions)) {
