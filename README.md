@@ -63,7 +63,7 @@ $result = $db->create_table([
     'table_name' => 'users',
     'columns' => [
         'id' => 'INT AUTO_INCREMENT PRIMARY KEY',
-        'name' => 'VARCHAR(50)',
+        'username' => 'VARCHAR(50)',
         'email' => 'VARCHAR(100)'
     ]
 ]);
@@ -102,9 +102,43 @@ You can retrieve data from a table using the `select` method. Provide the table 
 ```php
 $users = $db->select([
     'table_name' => 'users',
+    'columns' => 'id, username', // default: *
     'where' => [
-        ['id', '=', 1]
-    ]
+        ['id', '=', 1],
+        ['username', 'LIKE', 'a%'],
+    ],
+    'order_by' => 'id DESC, username ASC',
+    'group_by' => 'username',
+    'limit' => 5
+]);
+```
+
+#### Using joins
+
+```php
+$users = $db->select([
+    'table_name' => 'users',
+    'where' => [
+        ['users.id', '>', 1],
+        ['staff.id', '>', 1],
+    ],
+    'join' => [
+        [
+            'table_name' => 'staff',
+            'type' => 'RIGHT', // default: INNER
+            'on' => 'users.id = staff.user_id'
+        ],
+        [
+            'table_name' => 'purchases',
+            'columns' => 'id, product_id', // default: *
+            'on' => 'users.id = purchases.user_id'
+        ],
+        [
+            'table_name' => 'products',
+            'columns': => 'name', // default: *
+            'on' => 'purchases.product_id = products.id'
+        ]
+    ],
 ]);
 ```
 
@@ -116,7 +150,7 @@ To insert a new record, use the `create` method with the table name and an array
 $new_user = $db->create([
     'table_name' => 'users',
     'data' => [
-        'name' => 'Lullaby',
+        'username' => 'Lullaby',
         'email' => 'lucianobrumer5@gmail.com'
     ]
 ]);

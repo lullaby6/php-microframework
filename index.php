@@ -31,13 +31,8 @@ $staff = $db->select([
         ['id', '<=', 5],
         ['first_name', '=', 'Luciano'],
     ],
-    'order_by' => [
-        'id DESC',
-        'first_name ASC'
-    ],
-    'group_by' => [
-        'first_name'
-    ],
+    'order_by' => 'id DESC, first_name ASC',
+    'group_by' => 'first_name',
     'join' => [
         [
             'table_name' => 'users',

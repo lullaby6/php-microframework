@@ -167,13 +167,15 @@ class Database {
             $where_string = " WHERE " . implode(" AND ", $where_strings);
         }
 
-        if (!empty($group_by)) $group_by_string = " GROUP BY " . implode(", ", $group_by);
+        if (!empty($group_by)) $group_by_string = " GROUP BY $group_by";
 
-        if (!empty($order_by)) $order_by_string = " ORDER BY " . implode(", ", $order_by);
+        if (!empty($order_by)) $order_by_string = " ORDER BY $order_by";
 
         if (!empty($limit)) $limit_string = " LIMIT $limit";
 
         $sql = "SELECT $columns FROM $table_name" . (!empty($join) ? " $join_string" : "") . (!empty($where) ? " $where_string" : "") . (!empty($order_by) ? " $order_by_string" : "") . (!empty($group_by) ? " $group_by_string" : "") . (!empty($limit) ? " $limit_string" : "");
+
+        echo $sql;
 
         $stmt = $this->execute($sql, $params);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
