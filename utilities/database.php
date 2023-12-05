@@ -82,6 +82,21 @@ class Database {
         }
     }
 
+    function get_table_columns($table_name) {
+        if (empty($table_name)) {
+            throw new Exception('Table name is required.');
+        }
+
+        $sql = "SHOW COLUMNS FROM $table_name";
+
+        try {
+            $result = $this->query($sql);
+            return $result->fetchAll(PDO::FETCH_COLUMN);
+        } catch (PDOException $e) {
+            throw new Exception('Error while getting table columns: ' . $e->getMessage());
+        }
+    }
+
     function select($table_name, $query_info) {
         $where;
         $where_string = "";
