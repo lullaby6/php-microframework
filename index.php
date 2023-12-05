@@ -16,16 +16,12 @@ $db = new Database([
     'password' => '',
 ]);
 
-$db->create([
-    'table_name' => 'staff',
-    'data' => [
-        'first_name' => 'Amber',
-        'last_name' => 'Jesus'
-    ]
+$db->create('staff', [
+    'first_name' => 'Amber',
+    'last_name' => 'Jesus'
 ]);
 
-$staff = $db->select([
-    'table_name' => 'staff',
+$staff = $db->select('staff', [
     'columns' => 'id, first_name, last_name',
     'where' => [
         ['id', '<=', 5],

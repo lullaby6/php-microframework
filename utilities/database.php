@@ -48,10 +48,7 @@ class Database {
         }
     }
 
-    function create_table($table_info) {
-        $table_name = $table_info['table_name'];
-        $columns = $table_info['columns'];
-
+    function create_table($table_name, $columns) {
         $sql = "CREATE TABLE IF NOT EXISTS $table_name (";
         $column_definitions = [];
 
@@ -85,8 +82,7 @@ class Database {
         }
     }
 
-    function select($query_info) {
-        $table_name = $query_info['table_name'];
+    function select($table_name, $query_info) {
         $where;
         $where_string = "";
         $columns = "*";
@@ -181,10 +177,7 @@ class Database {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    function create($query_info) {
-        $table_name = $query_info['table_name'];
-        $data = $query_info['data'];
-
+    function create($table_name, $data) {
         $columns = implode(", ", array_keys($data));
         $values = ":" . implode(", :", array_keys($data));
         $sql = "INSERT INTO $table_name ($columns) VALUES ($values)";
@@ -197,13 +190,7 @@ class Database {
         return $this->connection->lastInsertId();
     }
 
-    function update($query_info) {
-        $table_name = $query_info['table_name'];
-        $data = $query_info['data'];
-        $where;
-
-        if (isset($query_info['where'])) $where = $query_info['where'];
-
+    function update($table_name, $data, $where) {
         $set = [];
         $params = $data;
 
@@ -229,14 +216,8 @@ class Database {
         return $this->execute($sql, $params);
     }
 
-    function delete($query_info) {
-        $table_name = $query_info['table_name'];
-        $where;
-
-        if (isset($query_info['where'])) $where = $query_info['where'];
-
-        $sql = "DELETE FROM $table WHERE ";
-        $where = [];
+    function delete($table_name, $where) {
+        $sql = "DELETE FROM $table_name WHERE ";
         $params = [];
 
         if (!empty($where)) {
@@ -251,8 +232,6 @@ class Database {
 
             $sql .= implode(" AND ", $where_strings);
         }
-
-        $sql .= implode(" AND ", $where);
 
         return $this->execute($sql, $params);
     }
