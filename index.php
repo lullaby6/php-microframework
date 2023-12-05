@@ -23,25 +23,6 @@ $db->create('staff', [
 
 $staff = $db->select('staff', [
     'columns' => 'id, first_name, last_name',
-    'where' => [
-        ['id', '<=', 5],
-        ['first_name', '=', 'Luciano'],
-    ],
-    'order_by' => 'id DESC, first_name ASC',
-    'group_by' => 'first_name',
-    'join' => [
-        [
-            'table_name' => 'users',
-            'type' => 'LEFT',
-            'on' => 'staff.user_id = users.id'
-        ],
-        [
-            'table_name' => 'products',
-            'columns' => 'id, name',
-            'on' => 'staff.user_id = products.user_id'
-        ]
-    ],
-    'limit' => 5
 ]);
 
 foreach ($staff as $row) {
