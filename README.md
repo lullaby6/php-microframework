@@ -74,7 +74,7 @@ You can delete a table if it exists using the `delete_table` method by providing
 $result = $db->delete_table('users');
 ```
 
-### Getting Tables
+### Getting Table Columns
 
 To get columns name/field, type, default and etc... you can use `get_table_columns` method by providing the table name:
 
