@@ -129,7 +129,9 @@ You can update data in a table using the `update` method. Provide the table name
 ```php
 $user_updated = $db->update([
     'table_name' => 'users',
-    'data' =>  ['email' => 'lucianobrumer5@gmail.com2'],
+    'data' =>  [
+        'email' => 'lucianobrumer2023@gmail.com'
+    ],
     'where' => [
         ['id', '=', 1]
     ]
