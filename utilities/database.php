@@ -89,6 +89,8 @@ class Database {
         $table_name = $query_info['table_name'];
         $conditions;
         $columns = "*";
+        $orders;
+        $groups;
         $limit;
 
         if (isset($query_info['conditions'])) {
@@ -97,6 +99,14 @@ class Database {
 
         if (isset($query_info['columns'])) {
             $columns = $query_info['columns'];
+        }
+        
+        if (isset($query_info['order'])) {
+            $orders = $query_info['order'];
+        }
+
+        if (isset($query_info['group'])) {
+            $groups = $query_info['group'];
         }
 
         if (isset($query_info['limit'])) {
@@ -107,7 +117,6 @@ class Database {
         $params = [];
 
         if (!empty($conditions)) {
-            $sql .= " WHERE ";
             $where = [];
 
             foreach ($conditions as $index=>$condition) {
@@ -116,13 +125,22 @@ class Database {
                 $params[":$index"] = $value;
             }
 
-            $sql .= implode(" AND ", $where);
+            $sql .= " WHERE " . implode(" AND ", $where);
+        }
+
+        if (!empty($groups)) {
+            $sql .= " GROUP BY " . implode(", ", $groups);
+        }
+
+        if (!empty($orders)) {
+            $sql .= " ORDER BY " . implode(", ", $orders);
         }
 
         if (!empty($limit)) {
             $sql .= " LIMIT $limit";
         }
 
+        echo $sql;
 
         $stmt = $this->execute($sql, $params);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
