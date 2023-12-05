@@ -102,7 +102,7 @@ You can retrieve data from a table using the `select` method. Provide the table 
 ```php
 $users = $db->select([
     'table_name' => 'users',
-    'conditions' => [
+    'where' => [
         ['id', '=', 1]
     ]
 ]);
@@ -127,7 +127,9 @@ You can update data in a table using the `update` method. Provide the table name
 $user_updated = $db->update([
     'table_name' => 'users',
     'data' =>  ['email' => 'lucianobrumer5@gmail.com2'],
-    'conditions' => [['id', '=', 1]]
+    'where' => [
+        ['id', '=', 1]
+    ]
 ]);
 ```
 
@@ -138,7 +140,9 @@ To delete records, use the `delete` method with the table name and conditions:
 ```php
 $user_deleted = $db->delete([
     'table_name' => 'users',
-    'conditions' => [['id', '>', 1]]
+    'where' => [
+        ['id', '>', 1]
+    ]
 ]);
 ```
 

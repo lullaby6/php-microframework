@@ -87,60 +87,93 @@ class Database {
 
     function select($query_info) {
         $table_name = $query_info['table_name'];
-        $conditions;
+        $where;
+        $where_string = "";
         $columns = "*";
-        $orders;
-        $groups;
+        $order_by;
+        $order_by_string = "";
+        $group_by;
+        $group_by_string = "";
+        $join;
+        $join_string = "";
         $limit;
+        $limit_string = "";
 
-        if (isset($query_info['conditions'])) {
-            $conditions = $query_info['conditions'];
-        }
+        if (isset($query_info['columns'])) $columns = $query_info['columns'];
 
-        if (isset($query_info['columns'])) {
-            $columns = $query_info['columns'];
-        }
-        
-        if (isset($query_info['order'])) {
-            $orders = $query_info['order'];
-        }
+        if (isset($query_info['join'])) $join = $query_info['join'];
 
-        if (isset($query_info['group'])) {
-            $groups = $query_info['group'];
-        }
+        if (isset($query_info['where'])) $where = $query_info['where'];
 
-        if (isset($query_info['limit'])) {
-            $limit = $query_info['limit'];
-        }
+        if (isset($query_info['order_by'])) $order_by = $query_info['order_by'];
 
-        $sql = "SELECT " . $columns . " FROM $table_name";
+        if (isset($query_info['group_by'])) $group_by = $query_info['group_by'];
+
+        if (isset($query_info['limit'])) $limit = $query_info['limit'];
+
         $params = [];
 
-        if (!empty($conditions)) {
-            $where = [];
+        if (!empty($join)) {
+            if (str_contains($columns, ",")){
+                $columns_trimmed = str_replace(' ', '', $columns);
+                $columns_array = explode(",", $columns_trimmed);
+                $columns_list = [];
+                foreach ($columns_array as $column) {
+                    $columns_list[] = "$table_name.$column";
+                }
+                $columns = implode(", ", $columns_list);
+            }else {
+                $columns = "$table_name.*";
+            }
 
-            foreach ($conditions as $index=>$condition) {
-                list($column, $operator, $value) = $condition;
-                $where[] = "$column $operator :$index";
+            $join_strings = [];
+            $join_columns_string = [];
+
+            foreach ($join as $join_item) {
+                if (!isset($join_item['type'])) $join_item['type'] = 'INNER';
+
+                if (!isset($join_item['columns'])) $join_item['columns'] = '*';
+
+                $join_item_table_name = $join_item['table_name'];
+                $join_item_columns = $join_item['columns'];
+                $join_item_type = strtoupper($join_item['type']);
+                $join_item_on = $join_item['on'];
+                $join_strings[] = " $join_item_type JOIN $join_item_table_name ON $join_item_on";
+
+                if (str_contains($join_item_columns, ",")){
+                    $join_item_columns_trimmed = str_replace(' ', '', $join_item_columns);
+                    $join_item_columns_array = explode(",", $join_item_columns_trimmed);
+                    foreach ($join_item_columns_array as $join_item_column) {
+                        $join_columns_string[] = "$join_item_table_name.$join_item_column";
+                    }
+                }else {
+                    $join_columns_string[] = "$join_item_table_name.*";
+                }
+            }
+
+            $join_string = implode(" ", $join_strings);
+            $columns .= ", " . implode(", ", $join_columns_string);
+        }
+
+        if (!empty($where)) {
+            $where_strings = [];
+
+            foreach ($where as $index=>$where_item) {
+                list($column, $operator, $value) = $where_item;
+                $where_strings[] = "$column $operator :$index";
                 $params[":$index"] = $value;
             }
 
-            $sql .= " WHERE " . implode(" AND ", $where);
+            $where_string = " WHERE " . implode(" AND ", $where_strings);
         }
 
-        if (!empty($groups)) {
-            $sql .= " GROUP BY " . implode(", ", $groups);
-        }
+        if (!empty($group_by)) $group_by_string = " GROUP BY " . implode(", ", $group_by);
 
-        if (!empty($orders)) {
-            $sql .= " ORDER BY " . implode(", ", $orders);
-        }
+        if (!empty($order_by)) $order_by_string = " ORDER BY " . implode(", ", $order_by);
 
-        if (!empty($limit)) {
-            $sql .= " LIMIT $limit";
-        }
+        if (!empty($limit)) $limit_string = " LIMIT $limit";
 
-        echo $sql;
+        $sql = "SELECT $columns FROM $table_name" . (!empty($join) ? " $join_string" : "") . (!empty($where) ? " $where_string" : "") . (!empty($order_by) ? " $order_by_string" : "") . (!empty($group_by) ? " $group_by_string" : "") . (!empty($limit) ? " $limit_string" : "");
 
         $stmt = $this->execute($sql, $params);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -165,11 +198,9 @@ class Database {
     function update($query_info) {
         $table_name = $query_info['table_name'];
         $data = $query_info['data'];
-        $conditions;
+        $where;
 
-        if (isset($query_info['conditions'])) {
-            $conditions = $query_info['conditions'];
-        }
+        if (isset($query_info['where'])) $where = $query_info['where'];
 
         $set = [];
         $params = $data;
@@ -180,17 +211,17 @@ class Database {
 
         $sql = "UPDATE $table_name SET " . implode(", ", $set);
 
-        if (!empty($conditions)) {
+        if (!empty($where)) {
             $sql .= " WHERE ";
-            $where = [];
+            $where_strings = [];
 
-            foreach ($conditions as $index=>$condition) {
-                list($column, $operator, $value) = $condition;
-                $where[] = "$column $operator :$index";
+            foreach ($where as $index=>$where_item) {
+                list($column, $operator, $value) = $where_item;
+                $where_strings[] = "$column $operator :$index";
                 $params[":$index"] = $value;
             }
 
-            $sql .= implode(" AND ", $where);
+            $sql .= implode(" AND ", $where_strings);
         }
 
         return $this->execute($sql, $params);
@@ -198,27 +229,25 @@ class Database {
 
     function delete($query_info) {
         $table_name = $query_info['table_name'];
-        $conditions;
+        $where;
 
-        if (isset($query_info['conditions'])) {
-            $conditions = $query_info['conditions'];
-        }
+        if (isset($query_info['where'])) $where = $query_info['where'];
 
         $sql = "DELETE FROM $table WHERE ";
         $where = [];
         $params = [];
 
-        if (!empty($conditions)) {
+        if (!empty($where)) {
             $sql .= " WHERE ";
-            $where = [];
+            $where_strings = [];
 
-            foreach ($conditions as $index=>$condition) {
-                list($column, $operator, $value) = $condition;
-                $where[] = "$column $operator :$index";
+            foreach ($where as $index=>$where_item) {
+                list($column, $operator, $value) = $where_item;
+                $where_strings[] = "$column $operator :$index";
                 $params[":$index"] = $value;
             }
 
-            $sql .= implode(" AND ", $where);
+            $sql .= implode(" AND ", $where_strings);
         }
 
         $sql .= implode(" AND ", $where);
