@@ -23,7 +23,7 @@ You can access the environment variables of the file ```".env"``` by calling the
 .env file:
 
 ```yml
-APP_NAME="MY_APP_NAME"
+APP_NAME=MY_APP_NAME
 ```
 
 php example:
