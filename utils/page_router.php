@@ -1,6 +1,6 @@
 <?php
 
-function router($dir_path, $only_index_files = true, $default_page = "404.php") {
+function page_router($dir_path, $only_index_files = true, $default_page = "404.php") {
     if (!empty($dir_path)) {
         $REQUEST_URL = $_SERVER['REQUEST_URI'];
 
@@ -15,9 +15,9 @@ function router($dir_path, $only_index_files = true, $default_page = "404.php") 
         $default_page = $dir_path . "/" . $default_page;
 
         $file_extensions = ["index.php", "index.html", "/index.php", "/index.html"];
-        if(!$only_index_files) $file_extensions = array_merge($file_extensions, ["", "/", ".php", ".html"]);
+        if (!$only_index_files) $file_extensions = array_merge($file_extensions, ["", "/", ".php", ".html"]);
 
-        $file_path;
+        $file_path = "";
 
         foreach ($file_extensions as $file_extension) {
             $file_path = $dir_path . $REQUEST_URL . $file_extension;
@@ -27,9 +27,7 @@ function router($dir_path, $only_index_files = true, $default_page = "404.php") 
         if (!file_exists($file_path) && file_exists($default_page)) $file_path = $default_page;
 
         include_once $file_path;
-    }else{
+    } else {
         trigger_error("dir path is required", E_USER_WARNING);
     }
 }
-
-?>

@@ -98,16 +98,16 @@ class Database {
     }
 
     function select($table_name, $query_info) {
-        $where;
+        $where = [];
         $where_string = "";
         $columns = "*";
-        $order_by;
+        $order_by = [];
         $order_by_string = "";
-        $group_by;
+        $group_by = [];
         $group_by_string = "";
-        $join;
+        $join = [];
         $join_string = "";
-        $limit;
+        $limit = [];
         $limit_string = "";
 
         if (isset($query_info['columns'])) $columns = $query_info['columns'];
@@ -232,7 +232,7 @@ class Database {
     }
 
     function delete($table_name, $where) {
-        $sql = "DELETE FROM $table_name WHERE ";
+        $sql = "DELETE FROM $table_name";
         $params = [];
 
         if (!empty($where)) {

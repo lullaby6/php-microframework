@@ -21,11 +21,12 @@ function generate_jwt($payload = [], $secret_key = "secret_key", $exp = 3600) {
     return $jwt;
 }
 
-
 function verify_jwt($jwt, $secret_key = "secret_key"){
     $tokenParts = explode('.', $jwt);
 
-    if (count($tokenParts) !== 3) return false;
+    if (count($tokenParts) !== 3) return [
+        'error' => 'Invalid token format'
+    ];
 
     $base64Header = $tokenParts[0];
     $base64Payload = $tokenParts[1];
@@ -34,15 +35,23 @@ function verify_jwt($jwt, $secret_key = "secret_key"){
     $header = json_decode(base64_decode($base64Header), true);
     $payload = json_decode(base64_decode($base64Payload), true);
 
-    if (!$header || !$payload) return false;
+    if (!$header || !$payload) return [
+        'error' => 'Invalid token format'
+    ];
 
-    if (empty($header['alg']) || $header['alg'] !== 'HS256') return false;
+    if (empty($header['alg']) || $header['alg'] !== 'HS256') return [
+        'error' => 'Invalid token algorithm'
+    ];
 
     $expectedSignature = hash_hmac('sha256', "$base64Header.$base64Payload", $secret_key);
-    // if ($signature !== $expectedSignature) return false;
-    if (!hash_equals($signature, $expectedSignature)) return false;
 
-    if (isset($payload['exp']) && $payload['exp'] < time()) return false;
+    if (!hash_equals($signature, $expectedSignature)) return [
+        'error' => 'Invalid token signature',
+    ];
+
+    if (isset($payload['exp']) && $payload['exp'] < time()) return [
+        'error' => 'Token expired'
+    ];
 
     return $payload;
 }

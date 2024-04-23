@@ -18,7 +18,7 @@ router('./pages', false)
 
 ## Environment Variables
 
-You can access the environment variables of the file ```".env"``` by calling the file ```"env.php"``` in ```"utilities"``` directory, the environment variables will be stored in ```$_ENV```
+You can access the environment variables of the file ```".env"``` by calling the file ```"env.php"``` in ```"utils"``` directory, the environment variables will be stored in ```$_ENV```
 
 .env file:
 
@@ -29,7 +29,7 @@ APP_NAME=MY_APP_NAME
 php example:
 
 ```php
-include_once ROOT_PATH . "/utilities/env.php";
+include_once ROOT_PATH . "/utils/env.php";
 
 echo $_ENV['APP_NAME'];
 ```

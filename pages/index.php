@@ -9,4 +9,3 @@ $todos = ["todo 1", "todo 2", "todo 3"];
 <?php foreach($todos as $todo) {
     include COMPONENTS_PATH . "todo.php";
 } ?>
-

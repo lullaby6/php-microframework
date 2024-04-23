@@ -17,5 +17,3 @@ if (file_exists($env_file_path)) {
         }
     }
 }
-
-?>

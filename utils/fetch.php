@@ -6,6 +6,7 @@ function fetch($url, $options = []) {
         'headers' => array(),
         'content' => null,
     ];
+
     $options = array_merge($defaultOptions, $options);
 
     $context = stream_context_create([
@@ -30,5 +31,3 @@ function fetch($url, $options = []) {
 //     'content' => $jsonData,
 // ));
 // $data = json_decode($response, true);
-
-?>

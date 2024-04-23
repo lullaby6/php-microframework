@@ -11,5 +11,3 @@ function header_text() {
 function header_html() {
     header('Content-Type: text/html');
 }
-
-?>

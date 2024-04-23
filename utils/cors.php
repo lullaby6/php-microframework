@@ -6,5 +6,3 @@ function cors($origin = "*", $methods = "*", $headers = "*", $credentials = "tru
     header("Access-Control-Allow-Headers: " . $headers);
     header("Access-Control-Allow-Credentials: " . $credentials);
 }
-
-?>
