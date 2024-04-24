@@ -255,5 +255,3 @@ class Database {
         $this->connection = null;
     }
 }
-
-?>

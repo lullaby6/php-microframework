@@ -1,5 +1,6 @@
 <?php
 
+include_once __DIR__ . "/consts.php";
 include_once ROOT_PATH . "/autoload.php";
 
-page_router(PAGES_PATH);
+file_router(ROUTES_PATH);
