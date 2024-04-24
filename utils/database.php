@@ -35,7 +35,6 @@ class Database {
         } catch (PDOException $e) {
             throw new Exception($e->getMessage());
         }
-        return false;
     }
 
     function execute($sql, $params = []) {
