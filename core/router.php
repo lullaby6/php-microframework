@@ -5,7 +5,7 @@
 $index_file_paths = ["index.php", "index.html", "/index.php", "/index.html"];
 
 foreach ($index_file_paths as $index_file_path) {
-    $path = ROUTES_PATH . $_CONTEXT["PATH"] . $index_file_path;
+    $path = ROUTES_PATH . $_PATH . $index_file_path;
 
     if (file_exists($path) && is_file($path)) {
         content_type_html();
@@ -22,7 +22,7 @@ foreach ($index_file_paths as $index_file_path) {
 
 // Public
 
-$public_file_path = PUBLIC_PATH . $_CONTEXT["PATH"];
+$public_file_path = PUBLIC_PATH . $_PATH;
 
 if (file_exists($public_file_path) && is_file($public_file_path)) {
     $mime_type = mime_content_type($public_file_path);

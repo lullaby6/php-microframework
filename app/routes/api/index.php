@@ -2,7 +2,7 @@
 
 content_type_json();
 
-if ($_CONTEXT['METHOD'] == 'GET') {
+if ($_METHOD == 'GET') {
     status_code(200);
 
     return json([

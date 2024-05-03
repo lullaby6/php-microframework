@@ -11,7 +11,6 @@ include_once UTILS_PATH . "header.php";
 include_once UTILS_PATH . "verify_mime_type.php";
 
 include_once CORE_PATH . "context.php";
-include_once CORE_PATH . "env.php";
 include_once CORE_PATH . "errors.php";
 include_once CORE_PATH . "template.php";
 include_once CORE_PATH . "router.php";
