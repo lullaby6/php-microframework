@@ -1,15 +1,11 @@
 <?php
 
-$REQUEST_URL = $_SERVER['REQUEST_URI'];
-
-if (str_contains($REQUEST_URL, '?')) $REQUEST_URL = explode('?', $REQUEST_URL)[0];
-
 // Routes
 
 $index_file_paths = ["index.php", "index.html", "/index.php", "/index.html"];
 
 foreach ($index_file_paths as $index_file_path) {
-    $path = ROUTES_PATH . $REQUEST_URL . $index_file_path;
+    $path = ROUTES_PATH . $_CONTEXT["PATH"] . $index_file_path;
 
     if (file_exists($path) && is_file($path)) {
         content_type_html();
@@ -26,7 +22,7 @@ foreach ($index_file_paths as $index_file_path) {
 
 // Public
 
-$public_file_path = PUBLIC_PATH . $REQUEST_URL;
+$public_file_path = PUBLIC_PATH . $_CONTEXT["PATH"];
 
 if (file_exists($public_file_path) && is_file($public_file_path)) {
     $mime_type = mime_content_type($public_file_path);
@@ -46,7 +42,7 @@ if (file_exists($public_file_path) && is_file($public_file_path)) {
 $not_found_path = ROUTES_PATH . "/404.php";
 
 if (file_exists($not_found_path)) {
-    include_once CORE_PATH . "global_css.php";
+    status_code(404);
 
     include_once $not_found_path;
 
