@@ -1,2 +1,5 @@
 RewriteEngine On
-RewriteRule ^(.*)$ index.php [NC,L,QSA]
+RewriteRule ^index.php$ - [NC,L,QSA]
+RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} !-f [OR]
+RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} !-d
+RewriteRule ^(.*)$ /index.php [NC,L,QSA]

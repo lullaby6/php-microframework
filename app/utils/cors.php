@@ -1,5 +1,7 @@
 <?php
 
+echo "xd";
+
 function cors($origin = "*", $methods = "*", $headers = "*", $credentials = "true") {
     header("Access-Control-Allow-Origin: " . $origin);
     header("Access-Control-Allow-Methods: " . $methods);
