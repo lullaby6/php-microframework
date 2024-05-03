@@ -1,5 +1,7 @@
 <?php
 
+$_ENV = getenv();
+
 $env_file_path = $_SERVER["DOCUMENT_ROOT"] . "/.env";
 
 if (file_exists($env_file_path)) {
@@ -14,6 +16,7 @@ if (file_exists($env_file_path)) {
             putenv("$name=$value");
             $_ENV[$name] = $value;
             $_SERVER[$name] = $value;
+            $_CONTEXT["ENV"][$name] = $value;
         }
     }
 }
