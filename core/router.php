@@ -1,42 +1,6 @@
 <?php
 
-
-function render_route($_render_route_file_path) {
-    extract($GLOBALS);
-
-    ob_start();
-
-    include_once $_render_route_file_path;
-
-    $_CURRENT_CONTENT_TYPE = get_response_header('Content-Type');
-
-    if (isset($_CURRENT_CONTENT_TYPE) && str_contains($_CURRENT_CONTENT_TYPE, 'text/html')) {
-        $_CONTENT = ob_get_clean();
-
-        if (isset($_LAYOUT)) {
-            ob_start();
-
-            if (isset($_LAYOUT_DATA)) extract($_LAYOUT_DATA);
-
-            include_once LAYOUTS_PATH . $_LAYOUT . ".php";
-            
-            $_CONTENT = ob_get_clean();
-        }
-
-        echo minify_html($_CONTENT);
-
-        load_css();
-
-        load_js();
-    }
-
-    if (ob_get_level() > 0) ob_end_flush();
-}
-
 // Routes
-
-$_LAYOUT = null;
-$_LAYOUT_DATA = null;
 
 $_LOWER_METHOD = strtolower($_METHOD);
 
@@ -49,7 +13,9 @@ foreach ($_FILE_NAMES as $_FILE_NAME) {
     $_FILE_PATH = ROUTES_PATH . $_PATH . $_FILE_NAME;
 
     if (file_exists($_FILE_PATH) && is_file($_FILE_PATH)) {
-        return render_route($_FILE_PATH);
+        include_once CORE_PATH . "render.php";
+
+        return;
     }
 }
 
@@ -103,7 +69,9 @@ foreach ($_PATH_VALUE_ROUTES as $_PATH_VALUE_ROUTE) {
             $_FILE_PATH = ROUTES_PATH . $_PATH_WITH_PATH_VALUES . $_FILE_NAME;
         
             if (file_exists($_FILE_PATH) && is_file($_FILE_PATH)) {
-                return render_route($_FILE_PATH);
+                include_once CORE_PATH . "render.php";
+
+                return;
             }
         }
     }
@@ -130,5 +98,9 @@ if (file_exists($_PUBLIC_FILE_PATH) && is_file($_PUBLIC_FILE_PATH)) {
 if (file_exists(NOT_FOUND_FILE_PATH)) {
     status_code(404);
 
-    return render_route(NOT_FOUND_FILE_PATH);
+    $_FILE_PATH = NOT_FOUND_FILE_PATH;
+
+    include_once CORE_PATH . "render.php";
+
+    return;
 }
