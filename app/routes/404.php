@@ -1,1 +1,5 @@
-<h1>404</h1>
+<?php
+
+json([
+    "error" => "Page not found",
+]);

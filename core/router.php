@@ -1,11 +1,12 @@
 <?php
 
-function render_route($_FILE_PATH) {
-    global $_LAYOUT, $_LAYOUT_DATA;
+
+function render_route($_render_route_file_path) {
+    extract($GLOBALS);
 
     ob_start();
 
-    include_once $_FILE_PATH;
+    include_once $_render_route_file_path;
 
     $_CURRENT_CONTENT_TYPE = get_response_header('Content-Type');
 
@@ -54,38 +55,59 @@ foreach ($_FILE_NAMES as $_FILE_NAME) {
 
 // Path Value
 
-// $path_parts = explode("/", $_PATH);
-// $path_value = $path_parts[count($path_parts)-1];
+$_ROUTES_FOLDERS = get_all_folder_paths(ROUTES_PATH);
 
-// unset($path_parts[count($path_parts)-1]);
+$_PATH_VALUE_ROUTES = array_filter($_ROUTES_FOLDERS, function($path) {
+    return str_contains($path, "[") && str_contains($path, "]");
+});
 
-// $base_path = ROUTES_PATH . implode("/", $path_parts);
+foreach ($_PATH_VALUE_ROUTES as $_PATH_VALUE_ROUTE) {
+    $_PATH_VALUE_ROUTE = str_replace(ROUTES_PATH, "", $_PATH_VALUE_ROUTE);
+    $_PATH_VALUE_ROUTE_WITH_VALUES = $_PATH_VALUE_ROUTE;
 
-// if (file_exists($base_path) && is_dir($base_path)) {
-//     $base_path_files = scandir( $base_path);
+    $_PATH_VALUE_ROUTE_PARTS = explode("/", $_PATH_VALUE_ROUTE);
 
-//     foreach ($base_path_files as $base_path_file) {
-//         if (str_starts_with($base_path_file, "[") && str_ends_with($base_path_file, "]")) {
-//             $_PATH_VALUE = $path_value;
+    $_PATH_VALUE_COUNT = substr_count($_PATH_VALUE_ROUTE, "[");
 
-//             foreach ($file_paths as $file_path) {
-//                 $path = $base_path . "/" . $base_path_file . "/"  . $file_path;
+    $_PATH_WITH_PATH_VALUES = $_PATH;
 
-//                 if (file_exists($path) && is_file($path)) {
-//                     content_type_html();
+    for ($i = 0; $i < $_PATH_VALUE_COUNT; $i++) {
+        $_PATH_VALUE_ROUTE_BASE = explode("[", $_PATH_VALUE_ROUTE_WITH_VALUES)[0];
 
-//                     include_once $path;
+        $_PATH_BASE = substr($_PATH, 0, strlen($_PATH_VALUE_ROUTE_BASE));
 
-//                     // $content_type = get_response_header('Content-Type');
+        if ($_PATH_BASE === $_PATH_VALUE_ROUTE_BASE) {
+            $_PATH_VALUE_NAME = explode("]", explode("[", $_PATH_VALUE_ROUTE_WITH_VALUES)[1])[0];
+            $_PATH_VALUE_FULL_NAME = "[{$_PATH_VALUE_NAME}]";
 
-//                     // if ($content_type && str_contains($content_type, 'text/html') || str_ends_with($path, '.html')) include_once CORE_PATH . "global_css.php";
+            $_PATH_WITH_PATH_VALUES_PARTS = explode("/", $_PATH_WITH_PATH_VALUES);
 
-//                     return;
-//                 }
-//             }
-//         }
-//     }
-// }
+            for ($i2 = 0; $i2 < count($_PATH_VALUE_ROUTE_PARTS); $i2++) {
+                if ($_PATH_VALUE_ROUTE_PARTS[$i2] === $_PATH_VALUE_FULL_NAME) {                    
+                    $_PATH_VALUE[$_PATH_VALUE_NAME] = $_PATH_WITH_PATH_VALUES_PARTS[$i2];
+
+                    $_PATH_VALUE_ROUTE_PARTS[$i2] = $_PATH_WITH_PATH_VALUES_PARTS[$i2];
+    
+                    $_PATH_WITH_PATH_VALUES_PARTS[$i2] = $_PATH_VALUE_FULL_NAME;
+                }
+
+                $_PATH_WITH_PATH_VALUES = implode("/", $_PATH_WITH_PATH_VALUES_PARTS);
+
+                $_PATH_VALUE_ROUTE_WITH_VALUES = implode("/", $_PATH_VALUE_ROUTE_PARTS);
+            }
+        }
+    }
+
+    if ($_PATH_WITH_PATH_VALUES == $_PATH_VALUE_ROUTE) {
+        foreach ($_FILE_NAMES as $_FILE_NAME) {
+            $_FILE_PATH = ROUTES_PATH . $_PATH_WITH_PATH_VALUES . $_FILE_NAME;
+        
+            if (file_exists($_FILE_PATH) && is_file($_FILE_PATH)) {
+                return render_route($_FILE_PATH);
+            }
+        }
+    }
+}
 
 // Public
 

@@ -1,5 +1,5 @@
 <?php
 
-return json([
-    "user" => "id"
+json([
+    "user" => $_PATH_VALUE["id"]
 ]);
