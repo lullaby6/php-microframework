@@ -10,6 +10,7 @@ const UTILS_PATH = ROOT_PATH . "/utils/";
 
 const APP_PATH = ROOT_PATH . "/app/";
 const ROUTES_PATH = APP_PATH . "/routes/";
+const MIDDLEWARES_PATH = APP_PATH . "/middlewares/";
 const PUBLIC_PATH = APP_PATH . "/public/";
 const LAYOUTS_PATH = APP_PATH . "/layouts/";
 const TEMPLATES_PATH = APP_PATH . "/templates/";
