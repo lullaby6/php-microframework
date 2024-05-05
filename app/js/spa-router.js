@@ -59,4 +59,4 @@ if (!window.SPARouter) window.SPARouter = {
     }
 }; 
 
-document.addEventListener('DOMContentLoaded', window.SPARouter.load());
+document.addEventListener('DOMContentLoaded', window.SPARouter.load);
