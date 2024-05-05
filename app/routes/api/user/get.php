@@ -1,0 +1,5 @@
+<?php
+
+json([
+    "user" => "get"
+]);

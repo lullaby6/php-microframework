@@ -1,3 +1,3 @@
 <?php
 
-include_once $_SERVER['DOCUMENT_ROOT'] . "/core/autoload.php";
+include_once CORE_PATH . "router.php";

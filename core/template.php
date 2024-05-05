@@ -2,7 +2,7 @@
 
 function render_template($template, $data = []) {
     extract($data);
-    require TEMPLATES_PATH."{$template}.php";
+    require TEMPLATES_PATH . "{$template}.php";
 }
 
 function render_array_template($templates, $array) {

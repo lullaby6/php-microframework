@@ -26,6 +26,7 @@ function content_type_js() {
 
 function get_response_header($header_name) {
     $header_name = strtolower("{$header_name}:");
+
     foreach (headers_list() as $header) {
         $header = strtolower($header);
         if (str_starts_with($header, $header_name)) {

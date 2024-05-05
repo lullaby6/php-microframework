@@ -1,72 +1,103 @@
 <?php
 
+function render_route($_FILE_PATH) {
+    global $_LAYOUT, $_LAYOUT_DATA;
+
+    ob_start();
+
+    include_once $_FILE_PATH;
+
+    $_CURRENT_CONTENT_TYPE = get_response_header('Content-Type');
+
+    if (isset($_CURRENT_CONTENT_TYPE) && str_contains($_CURRENT_CONTENT_TYPE, 'text/html')) {
+        $_CONTENT = ob_get_clean();
+
+        if (isset($_LAYOUT)) {
+            ob_start();
+
+            if (isset($_LAYOUT_DATA)) extract($_LAYOUT_DATA);
+
+            include_once LAYOUTS_PATH . $_LAYOUT . ".php";
+            
+            $_CONTENT = ob_get_clean();
+        }
+
+        echo minify_html($_CONTENT);
+
+        load_css();
+
+        load_js();
+    }
+
+    if (ob_get_level() > 0) ob_end_flush();
+}
+
 // Routes
 
-$index_file_paths = ["index.php", "index.html", "/index.php", "/index.html"];
+$_LAYOUT = null;
+$_LAYOUT_DATA = null;
 
-foreach ($index_file_paths as $index_file_path) {
-    $path = ROUTES_PATH . $_PATH . $index_file_path;
+$_LOWER_METHOD = strtolower($_METHOD);
 
-    if (file_exists($path) && is_file($path)) {
-        content_type_html();
+if ($_LOWER_METHOD === "get") content_type_html();
+status_code(200);
 
-        include_once $path;
+$_FILE_NAMES = ["{$_LOWER_METHOD}.php", "/{$_LOWER_METHOD}.php"];
 
-        $content_type = get_response_header('Content-Type');
+foreach ($_FILE_NAMES as $_FILE_NAME) {
+    $_FILE_PATH = ROUTES_PATH . $_PATH . $_FILE_NAME;
 
-        if ($content_type && str_contains($content_type, 'text/html') || str_ends_with($path, '.html')) include_once CORE_PATH . "global_css.php";
-
-        return;
+    if (file_exists($_FILE_PATH) && is_file($_FILE_PATH)) {
+        return render_route($_FILE_PATH);
     }
 }
 
 // Path Value
 
-$path_parts = explode("/", $_PATH);
-$path_value = $path_parts[count($path_parts)-1];
+// $path_parts = explode("/", $_PATH);
+// $path_value = $path_parts[count($path_parts)-1];
 
-unset($path_parts[count($path_parts)-1]);
+// unset($path_parts[count($path_parts)-1]);
 
-$base_path = ROUTES_PATH . implode("/", $path_parts);
+// $base_path = ROUTES_PATH . implode("/", $path_parts);
 
-if (file_exists($base_path) && is_dir($base_path)) {
-    $base_path_files = scandir( $base_path);
+// if (file_exists($base_path) && is_dir($base_path)) {
+//     $base_path_files = scandir( $base_path);
 
-    foreach ($base_path_files as $base_path_file) {
-        if (str_starts_with($base_path_file, "[") && str_ends_with($base_path_file, "]")) {
-            $_PATH_VALUE = $path_value;
+//     foreach ($base_path_files as $base_path_file) {
+//         if (str_starts_with($base_path_file, "[") && str_ends_with($base_path_file, "]")) {
+//             $_PATH_VALUE = $path_value;
 
-            foreach ($index_file_paths as $index_file_path) {
-                $path = $base_path . "/" . $base_path_file . "/"  . $index_file_path;
+//             foreach ($file_paths as $file_path) {
+//                 $path = $base_path . "/" . $base_path_file . "/"  . $file_path;
 
-                if (file_exists($path) && is_file($path)) {
-                    content_type_html();
+//                 if (file_exists($path) && is_file($path)) {
+//                     content_type_html();
 
-                    include_once $path;
+//                     include_once $path;
 
-                    $content_type = get_response_header('Content-Type');
+//                     // $content_type = get_response_header('Content-Type');
 
-                    if ($content_type && str_contains($content_type, 'text/html') || str_ends_with($path, '.html')) include_once CORE_PATH . "global_css.php";
+//                     // if ($content_type && str_contains($content_type, 'text/html') || str_ends_with($path, '.html')) include_once CORE_PATH . "global_css.php";
 
-                    return;
-                }
-            }
-        }
-    }
-}
+//                     return;
+//                 }
+//             }
+//         }
+//     }
+// }
 
 // Public
 
-$public_file_path = PUBLIC_PATH . $_PATH;
+$_PUBLIC_FILE_PATH = PUBLIC_PATH . $_PATH;
 
-if (file_exists($public_file_path) && is_file($public_file_path)) {
-    $mime_type = mime_content_type($public_file_path);
+if (file_exists($_PUBLIC_FILE_PATH) && is_file($_PUBLIC_FILE_PATH)) {
+    $mime_type = mime_content_type($_PUBLIC_FILE_PATH);
 
     if (verify_mime_type($mime_type)) {
         header("Content-Type: $mime_type");
-        readfile($public_file_path);
 
-        if (str_ends_with($public_file_path, '.html')) include_once CORE_PATH . "global_css.php";
+        readfile($_PUBLIC_FILE_PATH);
 
         return;
     }
@@ -74,13 +105,8 @@ if (file_exists($public_file_path) && is_file($public_file_path)) {
 
 // Not found
 
-$not_found_path = ROUTES_PATH . "/404.php";
-
-if (file_exists($not_found_path)) {
+if (file_exists(NOT_FOUND_FILE_PATH)) {
     status_code(404);
 
-    include_once $not_found_path;
-
-    return;
+    return render_route(NOT_FOUND_FILE_PATH);
 }
-
