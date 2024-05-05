@@ -47,15 +47,6 @@ if (!window.SPARouter) window.SPARouter = {
             attributeOldValue: true,
             characterDataOldValue: true
         });
-    
-        document.head.innerHTML += `
-            <style>
-                ::view-transition-old(root),
-                ::view-transition-new(root) {
-                    animation-duration: 0.3s;
-                }
-            </style>
-        `
     }
 }; 
 
