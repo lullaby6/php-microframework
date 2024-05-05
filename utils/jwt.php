@@ -1,6 +1,6 @@
 <?php
 
-function generate_jwt($payload = [], $secret_key = "secret_key", $exp = 3600) {
+function generate_jwt(array $payload = [], string $secret_key = "secret_key", int $exp = 3600): string {
     $header = [
         'alg' => 'HS256',
         'typ' => 'JWT'
@@ -21,7 +21,7 @@ function generate_jwt($payload = [], $secret_key = "secret_key", $exp = 3600) {
     return $jwt;
 }
 
-function verify_jwt($jwt, $secret_key = "secret_key"){
+function verify_jwt($jwt, $secret_key = "secret_key") {
     $tokenParts = explode('.', $jwt);
 
     if (count($tokenParts) !== 3) return [

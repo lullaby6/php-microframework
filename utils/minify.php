@@ -1,6 +1,6 @@
 <?php
 
-function minify_html($html) {
+function minify_html(string $html): string {
     $search = array(
         '/\>[^\S ]+/s',     // strip whitespaces after tags, except space
         '/[^\S ]+\</s',     // strip whitespaces before tags, except space
@@ -20,7 +20,7 @@ function minify_html($html) {
     return $html;
 }
 
-function minify_css($css) {
+function minify_css(string $css): string {
     // Remove comments
     $css = preg_replace('!/\*[^*]*\*+([^/][^*]*\*+)*/!', '', $css);
     // Remove spaces before and after selectors, braces, and colons
@@ -31,6 +31,6 @@ function minify_css($css) {
     return $css;
 }
 
-function minify_js($javascript){
+function minify_js(string $javascript): string {
     return preg_replace(array("/\s+\n/", "/\n\s+/", "/ +/"), array("\n", "\n ", " "), $javascript);
 }

@@ -1,6 +1,6 @@
 <?php
 
-function get_all_folder_paths($folder_path) {
+function get_all_folder_paths(string $folder_path): array {
     $folder_paths = [];
 
     foreach (scandir($folder_path) as $file_path) {

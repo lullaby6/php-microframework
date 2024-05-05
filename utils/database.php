@@ -8,7 +8,7 @@ class Database {
     public $password;
     private $connection = null;
 
-    function __construct($db_info) {
+    function __construct(array $db_info) {
         $this->driver = $db_info['driver'];
         $this->host = $db_info['host'];
         $this->database = $db_info['database'];
@@ -28,7 +28,7 @@ class Database {
         }
     }
 
-    function query($sql) {
+    function query(string $sql) {
         try {
             $result = $this->connection->query($sql);
             return $result;
@@ -37,7 +37,7 @@ class Database {
         }
     }
 
-    function execute($sql, $params = []) {
+    function execute(string $sql, array $params = []) {
         try {
             $stmt = $this->connection->prepare($sql);
             $stmt->execute($params);
@@ -47,7 +47,7 @@ class Database {
         }
     }
 
-    function create_table($table_name, $columns) {
+    function create_table(string $table_name, array $columns): bool {
         $sql = "CREATE TABLE IF NOT EXISTS $table_name (";
         $column_definitions = [];
 
@@ -66,11 +66,7 @@ class Database {
         }
     }
 
-    function delete_table($table_name) {
-        if (empty($table_name)) {
-            throw new Exception('Table name is required.');
-        }
-
+    function delete_table(string $table_name): bool {
         $sql = "DROP TABLE IF EXISTS $table_name";
 
         try {
@@ -81,11 +77,7 @@ class Database {
         }
     }
 
-    function get_table_columns($table_name) {
-        if (empty($table_name)) {
-            throw new Exception('Table name is required.');
-        }
-
+    function get_table_columns(string $table_name): array {
         $sql = "SHOW COLUMNS FROM $table_name";
 
         try {
@@ -96,30 +88,23 @@ class Database {
         }
     }
 
-    function select($table_name, $query_info) {
-        $where = [];
+    function select(string $table_name, array $query_info): array {
+        $columns = $query_info['columns'] ?? "*";
+
+        $where = $query_info['where'] ?? [];
         $where_string = "";
-        $columns = "*";
-        $order_by = [];
+
+        $order_by = $query_info['order_by'] ?? [];
         $order_by_string = "";
-        $group_by = [];
+
+        $group_by = $query_info['group_by'] ?? [];
         $group_by_string = "";
-        $join = [];
+
+        $join = $query_info['join'] ?? [];
         $join_string = "";
-        $limit = [];
+
+        $limit = $query_info['limit'] ?? [];
         $limit_string = "";
-
-        if (isset($query_info['columns'])) $columns = $query_info['columns'];
-
-        if (isset($query_info['join'])) $join = $query_info['join'];
-
-        if (isset($query_info['where'])) $where = $query_info['where'];
-
-        if (isset($query_info['order_by'])) $order_by = $query_info['order_by'];
-
-        if (isset($query_info['group_by'])) $group_by = $query_info['group_by'];
-
-        if (isset($query_info['limit'])) $limit = $query_info['limit'];
 
         $params = [];
 
@@ -187,11 +172,16 @@ class Database {
 
         // echo $sql;
 
-        $stmt = $this->execute($sql, $params);
+        try {
+            $stmt = $this->execute($sql, $params);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (\Throwable $th) {
+            throw new Exception("Failed to select data from table $table_name: " . $th->getMessage());
+        }
+        
     }
 
-    function create($table_name, $data) {
+    function create(string $table_name, array $data): int {
         $columns = implode(", ", array_keys($data));
         $values = ":" . implode(", :", array_keys($data));
         $sql = "INSERT INTO $table_name ($columns) VALUES ($values)";
@@ -200,11 +190,16 @@ class Database {
             $params[":$key"] = $value;
         }
 
-        $this->execute($sql, $params);
-        return $this->connection->lastInsertId();
+        try {
+            $this->execute($sql, $params);
+            return $this->connection->lastInsertId();
+        } catch (\Throwable $th) {
+            throw new Exception("Failed to insert data into table $table_name: " . $th->getMessage());
+        }
+        
     }
 
-    function update($table_name, $data, $where) {
+    function update(string $table_name, array $data, array $where) {
         $set = [];
         $params = $data;
 
@@ -227,10 +222,14 @@ class Database {
             $sql .= implode(" AND ", $where_strings);
         }
 
-        return $this->execute($sql, $params);
+        try {
+            return $this->execute($sql, $params);
+        } catch (\Throwable $th) {
+            throw new Exception("Failed to update data in table $table_name: " . $th->getMessage());
+        }
     }
 
-    function delete($table_name, $where) {
+    function delete(string $table_name, array $where) {
         $sql = "DELETE FROM $table_name";
         $params = [];
 
@@ -247,7 +246,12 @@ class Database {
             $sql .= implode(" AND ", $where_strings);
         }
 
-        return $this->execute($sql, $params);
+        try {
+            return $this->execute($sql, $params);
+        } catch (\Throwable $th) {
+            throw new Exception("Failed to delete data from table $table_name: " . $th->getMessage());
+        }
+        
     }
 
     function close() {

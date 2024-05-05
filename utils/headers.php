@@ -1,6 +1,6 @@
 <?php
 
-function status_code($code) {
+function status_code(int $code) {
     http_response_code($code);
 }
 
@@ -24,7 +24,7 @@ function content_type_js() {
     header('Content-Type: text/javascript');
 }
 
-function get_response_header($header_name) {
+function get_response_header(string $header_name): string {
     $header_name = strtolower("{$header_name}:");
 
     foreach (headers_list() as $header) {

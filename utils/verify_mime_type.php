@@ -1,6 +1,6 @@
 <?php
 
-function verify_mime_type($mime_type) {
+function verify_mime_type(string $mime_type): bool {
     $blocked_file_extensions = ['.php'];
 
     foreach ($blocked_file_extensions as $file_extension) {

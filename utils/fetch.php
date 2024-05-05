@@ -1,6 +1,6 @@
 <?php
 
-function fetch($url, $options = []) {
+function fetch(string $url, array $options = []) {
     $defaultOptions = [
         'method' => 'GET',
         'headers' => array(),
