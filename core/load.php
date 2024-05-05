@@ -32,7 +32,7 @@ function load_js() {
             echo "</script>";
 
             $js_content = ob_get_clean();
-            echo minify_css($js_content);
+            echo minify_js($js_content);
         }
     }
 }
