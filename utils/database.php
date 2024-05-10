@@ -1,19 +1,20 @@
 <?php
 
 class Database {
-    public $driver;
-    public $host;
-    public $database;
-    public $username;
-    public $password;
+    public array $config;
+    public string $driver;
+    public string $host;
+    public string $database;
+    public string $username;
+    protected string $password;
     private $connection = null;
 
-    function __construct(array $db_info) {
-        $this->driver = $db_info['driver'];
-        $this->host = $db_info['host'];
-        $this->database = $db_info['database'];
-        $this->username = $db_info['username'];
-        $this->password = $db_info['password'];
+    function __construct(array $config) {
+        $this->driver = $config['driver'];
+        $this->host = $config['host'];
+        $this->database = $config['database'];
+        $this->username = $config['username'];
+        $this->password = $config['password'];
 
         $this->connect();
     }
@@ -178,7 +179,6 @@ class Database {
         } catch (\Throwable $th) {
             throw new Exception("Failed to select data from table $table_name: " . $th->getMessage());
         }
-        
     }
 
     function create(string $table_name, array $data): int {
@@ -196,7 +196,6 @@ class Database {
         } catch (\Throwable $th) {
             throw new Exception("Failed to insert data into table $table_name: " . $th->getMessage());
         }
-        
     }
 
     function update(string $table_name, array $data, array $where) {
@@ -251,7 +250,6 @@ class Database {
         } catch (\Throwable $th) {
             throw new Exception("Failed to delete data from table $table_name: " . $th->getMessage());
         }
-        
     }
 
     function close() {

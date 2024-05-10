@@ -51,15 +51,15 @@ function is_ip_blocked($file_path, $ip, $time_seconds): bool {
 }
 
 function rate_limit($config = []): bool {
-    $LAST_REQUEST_PATH = isset($config['last_request_path']) ? $config['last_request_path'] : __DIR__ . "/last_request.txt";
-    $CLEAR_REQUESTS_TIME_SECONDS = isset($config['clear_requests_time_seconds']) ? $config['clear_requests_time_seconds'] : 3600;
+    $LAST_REQUEST_PATH = $config['last_request_path'] ?? __DIR__ . "/last_request.txt";
+    $CLEAR_REQUESTS_TIME_SECONDS = $config['clear_requests_time_seconds'] ?? 3600;
 
-    $BLOCKED_IPS_PATH = isset($config['blocked_ips_path']) ? $config['blocked_ips_path'] : __DIR__ . "/blocked_ips.json";
-    $BLOCK_IP_TIME_SECONDS = isset($config['block_ip_time_seconds']) ? $config['block_ip_time_seconds'] : 3600;
+    $BLOCKED_IPS_PATH = $config['blocked_ips_path'] ?? __DIR__ . "/blocked_ips.json";
+    $BLOCK_IP_TIME_SECONDS = $config['block_ip_time_seconds'] ?? 3600;
 
-    $REQUESTS_PATH = isset($config['requests_path']) ? $config['requests_path'] : __DIR__ . "/requests.json";
-    $REQUESTS_LIMIT = isset($config['requests_limit']) ? $config['requests_limit'] : 25;
-    $REQUESTS_TIME_SECONDS = isset($config['requests_time_seconds']) ? $config['requests_time_seconds'] : 1;
+    $REQUESTS_PATH = $config['requests_path'] ?? __DIR__ . "/requests.json";
+    $REQUESTS_LIMIT = $config['requests_limit'] ?? 25;
+    $REQUESTS_TIME_SECONDS = $config['requests_time_seconds'] ?? 1;
 
     $IP = isset($config['ip']) ? $config['ip'] : $_SERVER['REMOTE_ADDR'];
 

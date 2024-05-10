@@ -3,7 +3,7 @@
 $_LAYOUT = null;
 $_LAYOUT_DATA = null;
 
-function render_layout(string $layout, array $data = []): void {
+function use_layout(string $layout, array $data = []) {
     global $_LAYOUT, $_LAYOUT_DATA;
 
     extract($GLOBALS);

@@ -1,6 +1,8 @@
 <?php
 
-function render($file_path) {
+function render(string $file_path) {
+    global $_LAYOUT, $_LAYOUT_DATA;
+
     extract($GLOBALS);
 
     $_LAYOUT = null;

@@ -1,7 +1,10 @@
 <?php
 
 function render_template(string $template, array $data = []) {
+    extract($GLOBALS);
+
     extract($data);
+
     require TEMPLATES_PATH . "{$template}.php";
 }
 
