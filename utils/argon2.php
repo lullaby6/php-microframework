@@ -14,11 +14,11 @@ function argon2_password_hash(string $password, string $salt = '', string $peppe
     $to_hash = $password;
 
     if (!empty($salt)) {
-        $to_hash .= ".$salt";
+        $to_hash = $salt . $to_hash;
     }
 
     if (!empty($pepper)) {
-        $to_hash .= ".$pepper";
+        $to_hash .= $pepper;
     }
 
     $hash = password_hash($to_hash, PASSWORD_ARGON2I, $options);
@@ -42,11 +42,11 @@ function argon2_password_verify(string $hash, string $password, string $salt = '
     $to_hash = $password;
 
     if (!empty($salt)) {
-        $to_hash .= ".$salt";
+        $to_hash = $salt . $to_hash;
     }
 
     if (!empty($pepper)) {
-        $to_hash .= ".$pepper";
+        $to_hash .= $pepper;
     }
 
     $hash_to_verify = argon2_password_hash($to_hash, $salt, $pepper);
