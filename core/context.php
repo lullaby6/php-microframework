@@ -6,9 +6,11 @@ $_METHOD = $_SERVER['REQUEST_METHOD'];
 
 $_HEADERS = getallheaders();
 
+$_FULL_URL = (empty($_SERVER['HTTPS']) ? 'http' : 'https') . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+
 $_URL = $_SERVER['REQUEST_URI'];
 
-$_PATH = (str_contains($_URL, '?')) ? explode('?', $_URL)[0] : $_URL;
+$_PATH = parse_url($_FULL_URL)['path'];
 
 $_QUERY_STRING = (str_contains($_URL, '?')) ? explode('?', $_URL)[1] : '';
 

@@ -1,33 +1,43 @@
 <?php
 
-$_LAYOUT = null;
+function render($file_path) {
+    extract($GLOBALS);
 
-$_LAYOUT_DATA = null;
+    $_LAYOUT = null;
 
-ob_start();
+    $_LAYOUT_DATA = null;
 
-include_once $_FILE_PATH;
+    ob_start();
 
-$_CURRENT_CONTENT_TYPE = get_response_header('Content-Type');
+    include_once $file_path;
 
-if (isset($_CURRENT_CONTENT_TYPE) && str_contains($_CURRENT_CONTENT_TYPE, 'text/html')) {
     $_CONTENT = ob_get_clean();
 
-    if (isset($_LAYOUT)) {
-        ob_start();
+    $content_type = get_response_header('Content-Type');
 
-        if (isset($_LAYOUT_DATA)) extract($_LAYOUT_DATA);
+    if (isset($content_type) && str_contains($content_type, 'text/html')) {
+        if (isset($_LAYOUT)) {
+            $layout_path = LAYOUTS_PATH . $_LAYOUT . ".php";
 
-        include_once LAYOUTS_PATH . $_LAYOUT . ".php";
-        
-        $_CONTENT = ob_get_clean();
+            if (file_exists($layout_path)) {
+                ob_start();
+
+                if (isset($_LAYOUT_DATA)) extract($_LAYOUT_DATA);
+
+                include_once $layout_path;
+
+                $_CONTENT = ob_get_clean();
+            }
+        }
+
+        echo minify_html($_CONTENT);
+
+        load_css();
+
+        load_js();
+    } else {
+        echo $_CONTENT;
     }
 
-    echo minify_html($_CONTENT);
-
-    load_css();
-
-    load_js();
+    if (ob_get_level() > 0) ob_end_flush();
 }
-
-if (ob_get_level() > 0) ob_end_flush();

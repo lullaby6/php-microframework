@@ -17,11 +17,9 @@ const TEMPLATES_PATH = APP_PATH . "/templates/";
 const CSS_PATH = APP_PATH . "/css/";
 const JS_PATH = APP_PATH . "/js/";
 
-const NOT_FOUND_FILE_PATH = ROUTES_PATH . "/404.php";
-
 const SHOW_ERRORS = true;
 
-const MAX_REQUESTS = 25;
-const MAX_REQUEST_TIME_SECONDS = 1;
-const CLEAR_REQUESTS_TIME_SECONDS = 3600;
-const BLOCK_IP_TIME_SECONDS = 3600;
+// const MAX_REQUESTS = 25;
+// const MAX_REQUEST_TIME_SECONDS = 1;
+// const CLEAR_REQUESTS_TIME_SECONDS = 3600;
+// const BLOCK_IP_TIME_SECONDS = 3600;

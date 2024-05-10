@@ -1,106 +1,84 @@
 <?php
 
-// Routes
+function router_generate_regex_pattern($url) {
+    $pattern = preg_replace_callback('/\[(\w+)\]/', function($matches) {
+        return "(?P<{$matches[1]}>\w+)";
+    }, $url);
 
-$_LOWER_METHOD = strtolower($_METHOD);
-
-if ($_LOWER_METHOD === "get") content_type_html();
-status_code(200);
-
-$_FILE_NAMES = ["{$_LOWER_METHOD}.php", "/{$_LOWER_METHOD}.php"];
-
-foreach ($_FILE_NAMES as $_FILE_NAME) {
-    $_FILE_PATH = ROUTES_PATH . $_PATH . $_FILE_NAME;
-
-    if (file_exists($_FILE_PATH) && is_file($_FILE_PATH)) {
-        include_once CORE_PATH . "render.php";
-
-        return;
-    }
+    return "/^" . str_replace("/", "\/", $pattern) . "$/";
 }
 
-// Path Value
+function router() {
+    global $_PATH_VALUE;
 
-$_ROUTES_FOLDERS = get_all_folder_paths(ROUTES_PATH);
+    extract($GLOBALS);
 
-$_PATH_VALUE_ROUTES = array_filter($_ROUTES_FOLDERS, function($path) {
-    return str_contains($path, "[") && str_contains($path, "]");
-});
+    $method = strtolower($_METHOD);
 
-foreach ($_PATH_VALUE_ROUTES as $_PATH_VALUE_ROUTE) {
-    $_PATH_VALUE_ROUTE = str_replace(ROUTES_PATH, "", $_PATH_VALUE_ROUTE);
-    $_PATH_VALUE_ROUTE_WITH_VALUES = $_PATH_VALUE_ROUTE;
+    if ($method === "get") header('Content-Type: text/html');
+    http_response_code(200);
 
-    $_PATH_VALUE_ROUTE_PARTS = explode("/", $_PATH_VALUE_ROUTE);
+    // Route
+    $file_names = ["{$method}.php", "/{$method}.php"];
 
-    $_PATH_VALUE_COUNT = substr_count($_PATH_VALUE_ROUTE, "[");
+    foreach ($file_names as $file_name) {
+        $file_path = ROUTES_PATH . $_PATH . $file_name;
 
-    $_PATH_WITH_PATH_VALUES = $_PATH;
+        if (file_exists($file_path)) return render($file_path);
+    }
 
-    for ($i = 0; $i < $_PATH_VALUE_COUNT; $i++) {
-        $_PATH_VALUE_ROUTE_BASE = explode("[", $_PATH_VALUE_ROUTE_WITH_VALUES)[0];
+    // Path Value
 
-        $_PATH_BASE = substr($_PATH, 0, strlen($_PATH_VALUE_ROUTE_BASE));
+    $dirs = array_filter(get_all_sub_dirs(ROUTES_PATH), function($path) {
+        return preg_match('/\[[^\]]+\]/', $path);
+    });
 
-        if ($_PATH_BASE === $_PATH_VALUE_ROUTE_BASE) {
-            $_PATH_VALUE_NAME = explode("]", explode("[", $_PATH_VALUE_ROUTE_WITH_VALUES)[1])[0];
-            $_PATH_VALUE_FULL_NAME = "[{$_PATH_VALUE_NAME}]";
+    $dirs = array_map(function($path) {
+        return str_replace(ROUTES_PATH, "", $path);
+    }, $dirs);
 
-            $_PATH_WITH_PATH_VALUES_PARTS = explode("/", $_PATH_WITH_PATH_VALUES);
+    $path_deep = substr_count($_PATH, "/");
 
-            for ($i2 = 0; $i2 < count($_PATH_VALUE_ROUTE_PARTS); $i2++) {
-                if ($_PATH_VALUE_ROUTE_PARTS[$i2] === $_PATH_VALUE_FULL_NAME) {                    
-                    $_PATH_VALUE[$_PATH_VALUE_NAME] = $_PATH_WITH_PATH_VALUES_PARTS[$i2];
+    foreach ($dirs as $dir) {
+        if ($path_deep != substr_count($dir, "/")) {
+            continue;
+        }
 
-                    $_PATH_VALUE_ROUTE_PARTS[$i2] = $_PATH_WITH_PATH_VALUES_PARTS[$i2];
-    
-                    $_PATH_WITH_PATH_VALUES_PARTS[$i2] = $_PATH_VALUE_FULL_NAME;
+        $pattern = router_generate_regex_pattern($dir);
+
+        if (preg_match($pattern, $_PATH, $matches)) {
+            foreach ($file_names as $file_name) {
+                $file_path = ROUTES_PATH . $dir . $file_name;
+
+                if (file_exists($file_path)) {
+                    $_PATH_VALUE = $matches;
+
+                    return render($file_path);
                 }
-
-                $_PATH_WITH_PATH_VALUES = implode("/", $_PATH_WITH_PATH_VALUES_PARTS);
-
-                $_PATH_VALUE_ROUTE_WITH_VALUES = implode("/", $_PATH_VALUE_ROUTE_PARTS);
             }
         }
     }
 
-    if ($_PATH_WITH_PATH_VALUES == $_PATH_VALUE_ROUTE) {
-        foreach ($_FILE_NAMES as $_FILE_NAME) {
-            $_FILE_PATH = ROUTES_PATH . $_PATH_WITH_PATH_VALUES . $_FILE_NAME;
-        
-            if (file_exists($_FILE_PATH) && is_file($_FILE_PATH)) {
-                include_once CORE_PATH . "render.php";
+    // Public
 
-                return;
-            }
+    $public_file_path = PUBLIC_PATH . $_PATH;
+
+    if (file_exists($public_file_path)) {
+        $mime_type = mime_content_type($public_file_path);
+
+        if (verify_mime_type($mime_type)) {
+            header("Content-Type: $mime_type");
+
+            return readfile($public_file_path);
         }
     }
-}
 
-// Public
+    // Not found
+    $not_found_file_path = ROUTES_PATH . "/404.php";
 
-$_PUBLIC_FILE_PATH = PUBLIC_PATH . $_PATH;
+    if (file_exists($not_found_file_path)) {
+        http_response_code(404);
 
-if (file_exists($_PUBLIC_FILE_PATH) && is_file($_PUBLIC_FILE_PATH)) {
-    $mime_type = mime_content_type($_PUBLIC_FILE_PATH);
-
-    if (verify_mime_type($mime_type)) {
-        header("Content-Type: $mime_type");
-
-        readfile($_PUBLIC_FILE_PATH);
-
-        return;
+        return render($not_found_file_path);
     }
-}
-
-// Not found
-
-if (file_exists(NOT_FOUND_FILE_PATH)) {
-    status_code(404);
-
-    $_FILE_PATH = NOT_FOUND_FILE_PATH;
-
-    include_once CORE_PATH . "render.php";
-
-    return;
 }

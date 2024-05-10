@@ -1,8 +1,8 @@
 RewriteEngine On
-RewriteRule ^config/autoload.php$ - [NC,L,QSA]
+RewriteRule ^core/autoload.php$ - [NC,L,QSA]
 RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} !-f [OR]
 RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} !-d
-RewriteRule ^(.*)$ config/autoload.php [NC,L,QSA]
+RewriteRule ^(.*)$ core/autoload.php [NC,L,QSA]
 
 SetEnv DB_HOST "localhost"
 SetEnv DB_PORT "3306"
