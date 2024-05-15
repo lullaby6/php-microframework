@@ -30,7 +30,8 @@ function argon2_password_hash(string $password, string $salt = '', string $peppe
     return $hash;
 }
 
-function argon2_password_verify(string $hash, string $password, string $salt = '', string $pepper = ''): bool {
+// function argon2_password_verify(string $hash, string $password, string $salt = '', string $pepper = ''): bool {
+    function argon2_password_verify(string $hash, string $password, string $salt = '', string $pepper = ''): bool {
     if (empty($hash)) {
         throw new Exception("Hash cannot be empty");
     }
@@ -39,17 +40,13 @@ function argon2_password_verify(string $hash, string $password, string $salt = '
         throw new Exception("Password cannot be empty");
     }
 
-    $to_hash = $password;
-
     if (!empty($salt)) {
-        $to_hash = $salt . $to_hash;
+        $password = $salt . $password;
     }
 
     if (!empty($pepper)) {
-        $to_hash .= $pepper;
+        $password .= $pepper;
     }
 
-    $hash_to_verify = argon2_password_hash($to_hash, $salt, $pepper);
-
-    return hash_equals($hash_to_verify, $hash);
+    return password_verify($password, $hash);
 }

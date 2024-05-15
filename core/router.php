@@ -24,7 +24,9 @@ function router() {
     foreach ($file_names as $file_name) {
         $file_path = ROUTES_PATH . $_PATH . $file_name;
 
-        if (file_exists($file_path)) return render($file_path);
+        if (file_exists($file_path) && is_file($file_path)) {
+            return render($file_path);
+        }
     }
 
     // Path Value
@@ -50,7 +52,7 @@ function router() {
             foreach ($file_names as $file_name) {
                 $file_path = ROUTES_PATH . $dir . $file_name;
 
-                if (file_exists($file_path)) {
+                if (file_exists($file_path) && is_file($file_path)) {
                     $_PATH_VALUE = $matches;
 
                     return render($file_path);
@@ -61,15 +63,17 @@ function router() {
 
     // Public
 
-    $public_file_path = PUBLIC_PATH . $_PATH;
+    $public_files_paths = [PUBLIC_PATH . $_PATH, PUBLIC_PATH . $_PATH . "/index.html"];
 
-    if (file_exists($public_file_path)) {
-        $mime_type = mime_content_type($public_file_path);
+    foreach ($public_files_paths as $public_file_path) {
+        if (file_exists($public_file_path) && is_file($public_file_path)) {
+            $mime_type = mime_content_type($public_file_path);
 
-        if (verify_mime_type($mime_type)) {
-            header("Content-Type: $mime_type");
+            if (verify_mime_type($mime_type)) {
+                header("Content-Type: $mime_type");
 
-            return readfile($public_file_path);
+                return readfile($public_file_path);
+            }
         }
     }
 

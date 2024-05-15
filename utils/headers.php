@@ -33,4 +33,6 @@ function get_response_header(string $header_name): string {
             return trim(str_replace($header_name, '', $header));
         }
     }
+
+    return '';
 }

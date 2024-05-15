@@ -154,7 +154,7 @@ class Database {
         if (!empty($where)) {
             $where_strings = [];
 
-            foreach ($where as $index=>$where_item) {
+            foreach ($where as $index => $where_item) {
                 list($column, $operator, $value) = $where_item;
                 $where_strings[] = "$column $operator :$index";
                 $params[":$index"] = $value;
@@ -172,6 +172,7 @@ class Database {
         $sql = "SELECT $columns FROM $table_name" . (!empty($join) ? " $join_string" : "") . (!empty($where) ? " $where_string" : "") . (!empty($order_by) ? " $order_by_string" : "") . (!empty($group_by) ? " $group_by_string" : "") . (!empty($limit) ? " $limit_string" : "") . ";";
 
         // echo $sql;
+        // var_dump($params);
 
         try {
             $stmt = $this->execute($sql, $params);
