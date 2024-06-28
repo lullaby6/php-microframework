@@ -1,12 +1,12 @@
 <?php
 
 function load_css() {
+    if (!file_exists(CSS_PATH)) return;
+
     $css_files = scandir(CSS_PATH);
 
     foreach ($css_files as $css_file) {
-
         if (str_ends_with($css_file, ".css")) {
-
             ob_start();
 
             echo "<style>";
@@ -20,10 +20,11 @@ function load_css() {
 }
 
 function load_js() {
+    if (!file_exists(JS_PATH)) return;
+
     $js_files = scandir(JS_PATH);
 
     foreach ($js_files as $js_file) {
-
         if (str_ends_with($js_file, ".js")) {
             ob_start();
 

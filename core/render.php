@@ -1,7 +1,7 @@
 <?php
 
 function render(string $file_path) {
-    global $_LAYOUT, $_LAYOUT_DATA;
+    global $_LAYOUT, $_LAYOUT_DATA, $_BUFFERED_OUTPUT;
 
     extract($GLOBALS);
 
@@ -32,11 +32,17 @@ function render(string $file_path) {
             }
         }
 
+        ob_start();
+
         echo minify_html($_CONTENT);
 
         load_css();
 
         load_js();
+
+        echo $_BUFFERED_OUTPUT;
+
+        ob_end_flush();
     } else {
         echo $_CONTENT;
     }

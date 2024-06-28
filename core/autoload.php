@@ -6,12 +6,14 @@ ini_set('memory_limit', '-1');
 
 include_once __DIR__ . "/consts.php";
 
-include_once UTILS_PATH . "headers.php";
-include_once UTILS_PATH . "minify.php";
-include_once UTILS_PATH . "json.php";
-include_once UTILS_PATH . "verify_mime_type.php";
-include_once UTILS_PATH . "file.php";
-include_once UTILS_PATH . "valid.php";
+include_once CORE_UTILS_PATH . "headers.php";
+include_once CORE_UTILS_PATH . "minify.php";
+include_once CORE_UTILS_PATH . "json.php";
+include_once CORE_UTILS_PATH . "verify_mime_type.php";
+include_once CORE_UTILS_PATH . "file.php";
+include_once CORE_UTILS_PATH . "valid.php";
+include_once CORE_UTILS_PATH . "url.php";
+include_once CORE_UTILS_PATH . "on.php";
 
 include_once CORE_PATH . "context.php";
 include_once CORE_PATH . "ip.php";

@@ -1,5 +1,5 @@
 <?php
-use_layout("layout", ["title" => "Home"]);
+layout("layout", ["title" => "Home"]);
 
 $todos_array = [["text" => "todo 1"], ["text" => "todo 2"], ["text" => "todo 3"]];
 ?>

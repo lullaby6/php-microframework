@@ -19,7 +19,7 @@ class Database {
         $this->connect();
     }
 
-    function connect() {
+    public function connect() {
         try {
             $dsn = "$this->driver:host=$this->host;dbname=$this->database";
             $this->connection = new PDO($dsn, $this->username, $this->password);
@@ -29,7 +29,7 @@ class Database {
         }
     }
 
-    function query(string $sql) {
+    public function query(string $sql) {
         try {
             $result = $this->connection->query($sql);
             return $result;
@@ -38,7 +38,7 @@ class Database {
         }
     }
 
-    function execute(string $sql, array $params = []) {
+    public function execute(string $sql, array $params = []) {
         try {
             $stmt = $this->connection->prepare($sql);
             $stmt->execute($params);
@@ -48,7 +48,7 @@ class Database {
         }
     }
 
-    function create_table(string $table_name, array $columns): bool {
+    public function create_table(string $table_name, array $columns): bool {
         $sql = "CREATE TABLE IF NOT EXISTS $table_name (";
         $column_definitions = [];
 
@@ -67,7 +67,7 @@ class Database {
         }
     }
 
-    function delete_table(string $table_name): bool {
+    public function delete_table(string $table_name): bool {
         $sql = "DROP TABLE IF EXISTS $table_name";
 
         try {
@@ -78,7 +78,7 @@ class Database {
         }
     }
 
-    function get_table_columns(string $table_name): array {
+    public function get_table_columns(string $table_name): array {
         $sql = "SHOW COLUMNS FROM $table_name";
 
         try {
@@ -89,7 +89,19 @@ class Database {
         }
     }
 
-    function select(string $table_name, array $query_info): array {
+    public function get_table_primary_key(string $table_name): string {
+        $sql = "SHOW KEYS FROM $table_name WHERE Key_name = 'PRIMARY'";
+
+        try {
+            $result = $this->query($sql);
+            $row = $result->fetch(PDO::FETCH_ASSOC);
+            return $row['Column_name'];
+        } catch (PDOException $e) {
+            throw new Exception('Error while getting table primary key: ' . $e->getMessage());
+        }
+    }
+
+    public function select(string $table_name, array $query_info): array {
         $columns = $query_info['columns'] ?? "*";
 
         $where = $query_info['where'] ?? [];
@@ -152,15 +164,21 @@ class Database {
         }
 
         if (!empty($where)) {
-            $where_strings = [];
+            $where_string = " WHERE ";
 
             foreach ($where as $index => $where_item) {
-                list($column, $operator, $value) = $where_item;
-                $where_strings[] = "$column $operator :$index";
-                $params[":$index"] = $value;
-            }
+                if (count($where_item) < 4) {
+                    $where_item[] = 'AND';
+                }
 
-            $where_string = " WHERE " . implode(" AND ", $where_strings);
+                list($column, $operator, $value, $logic_operator) = $where_item;
+
+                $where_string .= "$column $operator :$index";
+
+                $params[":$index"] = $value;
+
+                if ($index != count($where) - 1) $where_string .= " $logic_operator ";
+            }
         }
 
         if (!empty($group_by)) $group_by_string = " GROUP BY $group_by";
@@ -176,9 +194,22 @@ class Database {
 
         try {
             $stmt = $this->execute($sql, $params);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (\Throwable $th) {
             throw new Exception("Failed to select data from table $table_name: " . $th->getMessage());
+        }
+    }
+
+    public function select_by_id(string $table_name, string $id, array $query_info): array {
+        try {
+            if (isset($query_info['where'])) {
+                $query_info['where'][] = ['id', '=', $id];
+            } else {
+                $query_info['where'] = [['id', '=', $id]];
+            }
+            return $this->select($table_name, $query_info);
+        } catch (\Throwable $th) {
+            throw new Exception("Failed to select data by id from table $table_name: " . $th->getMessage());
         }
     }
 
@@ -199,7 +230,7 @@ class Database {
         }
     }
 
-    function update(string $table_name, array $data, array $where) {
+    public function update(string $table_name, array $data, array $where) {
         $set = [];
         $params = $data;
 
@@ -229,7 +260,15 @@ class Database {
         }
     }
 
-    function delete(string $table_name, array $where) {
+    public function update_by_id(string $table_name, string $id, array $data, array $where = []) {
+        try {
+            return $this->update($table_name, $data, array_merge($where, [['id', '=', $id]]));
+        } catch (\Throwable $th) {
+            throw new Exception("Failed to update data by id in table $table_name: " . $th->getMessage());
+        }
+    }
+
+    public function delete(string $table_name, array $where) {
         $sql = "DELETE FROM $table_name";
         $params = [];
 
@@ -253,7 +292,31 @@ class Database {
         }
     }
 
-    function close() {
+    public function delete_by_id(string $table_name, string $id, array $where = []) {
+        try {
+            return $this->delete($table_name, array_merge($where, [['id', '=', $id]]));
+        } catch (\Throwable $th) {
+            throw new Exception("Failed to delete data from table $table_name: " . $th->getMessage());
+        }
+    }
+
+    public function transaction(callable $callback) {
+        $this->query("START TRANSACTION");
+
+        try {
+            $result = $callback();
+
+            $this->query("COMMIT");
+
+            return $result;
+        } catch (\Throwable $th) {
+            $this->query("ROLLBACK");
+
+            throw $th;
+        }
+    }
+
+    public function close() {
         $this->connection = null;
     }
 }
