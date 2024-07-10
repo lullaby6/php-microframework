@@ -1,6 +1,6 @@
 <?php
 
-function uuidv4($data = 16) {
+function uuidv4($data = 16): string {
     assert(strlen($data) == 16);
 
     $data[6] = chr(ord($data[6]) & 0x0f | 0x40); // set version to 0100
