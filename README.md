@@ -217,9 +217,9 @@ $db->transaction(function() {
 
     $db->update('users', [
         'email' => 'lullaby2024@gmail.com'
-        ],[
-            ['id', '=', $user_id]
-        ]);
+    ],[
+        ['id', '=', $user_id]
+    ]);
 
     $db->delete('users', [
         ['id', '=', $user_id]
