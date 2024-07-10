@@ -206,7 +206,7 @@ $db->close();
 
 ## Transactions
 
-When you use a transacion a ```START TRANSACTION``` is started, but the callback function from ```transaction``` method throws an error, the transaction run a ```ROLLBACK```, but if no one error, the transaction run a ```COMMIT```.
+When you use a the ```transacion``` method a ```START TRANSACTION``` is started, but the callback function from ```transaction``` method throws an error, the transaction run a ```ROLLBACK```, but if no one error, the transaction run a ```COMMIT```.
 
 ```php
 $db->transaction(function() {
