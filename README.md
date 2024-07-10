@@ -6,6 +6,26 @@
 php -S 127.0.0.1:3000
 ```
 
+## Context
+
+```php
+$_ENV; // environment variables
+
+$_BODY; // request body
+
+$_HEADERS; // request headers
+
+$_FULL_URL;
+
+$_URL;
+
+$_PATH; // $_URL path
+
+$_QUERY_STRING; // url query string
+
+$_PATH_VALUE;
+```
+
 ## Routing
 
 All http requests are redirected to ```index.php``` by ```.htaccess```, then the router takes care of routing the request with the file specified in the router ("./pages").
@@ -13,7 +33,7 @@ All http requests are redirected to ```index.php``` by ```.htaccess```, then the
 By default the router only redirects to the index.php of the request url, but you can specify it to redirect to any file within the specified path by adding a false when calling the function.
 
 ```php
-router('./pages', false)
+router()
 ```
 
 ## Environment Variables
