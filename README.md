@@ -31,14 +31,14 @@ $_PATH_VALUE;
 All http requests are redirected to by the ```.htaccess``` file, then the router takes care of routing the request with the ```router``` function.
 
 ```php
-router()
+router();
 ```
 
 ## Environment Variables
 
 You can access the environment variables of the file ```".env"``` by calling the file ```"env.php"``` in ```"utils"``` directory, the environment variables will be stored in ```$_ENV```
 
-.env file:
+```.env``` file:
 
 ```yml
 APP_NAME=MY_APP_NAME
@@ -55,8 +55,6 @@ echo $_ENV['APP_NAME'];
 ## Database
 
 This is a simple Database class for performing common database operations using PHP and PDO. The class provides methods for database connection, creating tables, dropping tables, executing SQL queries, and performing CRUD (Create, Read, Update, Delete) operations on data.
-
-### How to Use
 
 ### Initialize the Database
 
