@@ -5,7 +5,7 @@ define('SERVER_DOCUMENT_ROOT', $_SERVER['DOCUMENT_ROOT']);
 const ROOT_PATH = SERVER_DOCUMENT_ROOT;
 
 const CORE_PATH = ROOT_PATH . "/core/";
-const CORE_UTILS_PATH = ROOT_PATH . "/core/";
+const CORE_UTILS_PATH = ROOT_PATH . "/core/utils/";
 const CONFIG_PATH = ROOT_PATH . "/config/";
 const UTILS_PATH = ROOT_PATH . "/utils/";
 
