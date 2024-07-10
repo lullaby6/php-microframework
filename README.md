@@ -204,7 +204,7 @@ Don't forget to close the database connection when you're done:
 $db->close();
 ```
 
-## Transactions
+### Transactions
 
 When you use a the ```transacion``` method a ```START TRANSACTION``` is started, but the callback function from ```transaction``` method throws an error, the transaction run a ```ROLLBACK```, but if no one error, the transaction run a ```COMMIT```.
 
