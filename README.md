@@ -38,7 +38,7 @@ router();
 
 ## Environment Variables
 
-You can access the environment variables of the file ```".env"``` by calling the file ```"env.php"``` in ```"utils"``` directory, the environment variables will be stored in ```$_ENV```
+You can access the environment variables of the file ```.env``` by calling the file ```env.php``` in ```utils``` directory, the environment variables will be stored in ```$_ENV```
 
 ```.env``` file:
 
