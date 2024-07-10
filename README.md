@@ -24,6 +24,8 @@ $_PATH; // $_URL path
 $_QUERY_STRING; // url query string
 
 $_PATH_VALUE;
+
+$_IP; // client request ip
 ```
 
 ## Routing
@@ -166,9 +168,9 @@ $users = $db->select('users', [
 To insert a new record, use the `create` method with the table name and an array of data:
 
 ```php
-$new_user = $db->create('users', [
+$user_id = $db->create('users', [
     'username' => 'Lullaby',
-    'email' => 'lucianobrumer5@gmail.com'
+    'email' => 'lullaby2023@gmail.com'
 ]);
 ```
 
@@ -177,8 +179,8 @@ $new_user = $db->create('users', [
 You can update data in a table using the `update` method. Provide the table name, data to update, and optional conditions:
 
 ```php
-$user_updated = $db->update('users', [
-    'email' => 'lucianobrumer2023@gmail.com'
+$result = $db->update('users', [
+    'email' => 'lullaby2024@gmail.com'
 ],[
     ['id', '=', 1]
 ]);
@@ -189,7 +191,7 @@ $user_updated = $db->update('users', [
 To delete records, use the `delete` method with the table name and conditions:
 
 ```php
-$user_deleted = $db->delete('users', [
+$result = $db->delete('users', [
     ['id', '>', 1]
 ]);
 ```
@@ -200,4 +202,30 @@ Don't forget to close the database connection when you're done:
 
 ```php
 $db->close();
+```
+
+## Transactions
+
+When you use a transacion a ```START TRANSACTION``` is started, but the callback function from ```transaction``` method throws an error, the transaction run a ```ROLLBACK```, but if no one error, the transaction run a ```COMMIT```.
+
+```php
+$db->transaction(function() {
+    $user_id = $db->create('users', [
+        'username' => 'Lullaby',
+        'email' => 'lullaby2023@gmail.com'
+    ]);
+
+    $db->update('users', [
+        'email' => 'lullaby2024@gmail.com'
+        ],[
+            ['id', '=', $user_id]
+        ]);
+
+    $db->delete('users', [
+        ['id', '=', $user_id]
+    ]);
+
+    return $user_id;
+})
+
 ```
