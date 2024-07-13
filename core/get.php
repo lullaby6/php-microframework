@@ -1,7 +1,9 @@
 <?php
 
-function load_css() {
+function get_css() {
     if (!file_exists(CSS_PATH)) return;
+
+    $output = "";
 
     $css_files = scandir(CSS_PATH);
 
@@ -14,13 +16,17 @@ function load_css() {
             echo "</style>";
 
             $css_content = ob_get_clean();
-            echo minify_css($css_content);
+            $output .= minify_css($css_content);
         }
     }
+
+    return $output;
 }
 
-function load_js() {
+function get_js() {
     if (!file_exists(JS_PATH)) return;
+
+    $output = "";
 
     $js_files = scandir(JS_PATH);
 
@@ -33,7 +39,9 @@ function load_js() {
             echo "</script>";
 
             $js_content = ob_get_clean();
-            echo minify_js($js_content);
+            $output .= minify_js($js_content);
         }
     }
+
+    return $output;
 }

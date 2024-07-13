@@ -23,7 +23,7 @@ include_once CORE_PATH . "errors.php";
 include_once CORE_PATH . "layout.php";
 include_once CORE_PATH . "template.php";
 include_once CORE_PATH . "render.php";
-include_once CORE_PATH . "load.php";
+include_once CORE_PATH . "get.php";
 include_once CORE_PATH . "middleware.php";
 include_once CORE_PATH . "router.php";
 
