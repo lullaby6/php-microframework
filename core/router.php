@@ -67,7 +67,7 @@ function router() {
 
     foreach ($public_files_paths as $public_file_path) {
         if (file_exists($public_file_path) && is_file($public_file_path)) {
-            $mime_type = mime_content_type($public_file_path);
+            $mime_type = get_mime_content_type($public_file_path);
 
             if (verify_mime_type($mime_type)) {
                 header("Content-Type: $mime_type");

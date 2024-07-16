@@ -3,9 +3,3 @@ RewriteRule ^core/autoload.php$ - [NC,L,QSA]
 RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} !-f [OR]
 RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} !-d
 RewriteRule ^(.*)$ core/autoload.php [NC,L,QSA]
-
-SetEnv DB_HOST "localhost"
-SetEnv DB_PORT "3306"
-SetEnv DB_USER "root"
-SetEnv DB_PASS ""
-SetEnv DB_NAME "gym

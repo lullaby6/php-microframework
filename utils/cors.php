@@ -1,13 +1,15 @@
 <?php
 
 function cors(array $config = []) {
-    $config = array_merge([
+    $defaultConfig = [
         'origins' => ["*"],
         'methods' => ["*"],
         'headers' => ["*"],
         'credentials' => true,
         'max_age' => 86400
-    ], $config);
+    ];
+
+    $config = array_merge($defaultConfig, $config);
 
     cors_allow_origins(...$config['origins']);
     cors_allow_methods(...$config['methods']);
