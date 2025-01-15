@@ -1,45 +1,57 @@
 <?php
 
-function get_css() {
-    if (!file_exists(CSS_PATH)) return;
+function get_css($file_name, $minify = true) {
+    if (!str_ends_with($file_name, ".css")) $file_name .= ".css";
+
+    $file_path = PATHS['css'] . $file_name;
+    if (!file_exists($file_path)) return;
+
+    $content = file_get_contents($file_path);
+
+    if ($minify) $content = minify_css($content);
+
+    return "<style>$content</style>";
+}
+
+function get_js($file_name, $minify = true) {
+    if (!str_ends_with($file_name, ".js")) $file_name .= ".js";
+
+    $file_path = PATHS['js'] . $file_name;
+    if (!file_exists($file_path)) return;
+
+    $content = file_get_contents($file_path);
+
+    if ($minify) $content = minify_js($content);
+
+    return "<script>$content</script>";
+}
+
+function get_all_css() {
+    if (!file_exists(PATHS['css'])) return;
 
     $output = "";
 
-    $css_files = scandir(CSS_PATH);
+    $files = scandir(PATHS['css']);
 
-    foreach ($css_files as $css_file) {
-        if (str_ends_with($css_file, ".css")) {
-            ob_start();
-
-            echo "<style>";
-            include_once CSS_PATH . "/" . $css_file;
-            echo "</style>";
-
-            $css_content = ob_get_clean();
-            $output .= minify_css($css_content);
+    foreach ($files as $file) {
+        if (str_ends_with($file, ".css")) {
+            $output .= get_css($file);
         }
     }
 
     return $output;
 }
 
-function get_js() {
-    if (!file_exists(JS_PATH)) return;
+function get_all_js() {
+    if (!file_exists(PATHS['js'])) return;
 
     $output = "";
 
-    $js_files = scandir(JS_PATH);
+    $files = scandir(PATHS['js']);
 
-    foreach ($js_files as $js_file) {
-        if (str_ends_with($js_file, ".js")) {
-            ob_start();
-
-            echo "<script>";
-            include_once JS_PATH . "/" . $js_file;
-            echo "</script>";
-
-            $js_content = ob_get_clean();
-            $output .= minify_js($js_content);
+    foreach ($files as $file) {
+        if (str_ends_with($file, ".js")) {
+            $output .= get_js($file);
         }
     }
 

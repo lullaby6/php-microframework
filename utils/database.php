@@ -68,22 +68,65 @@ class Database {
     }
 
     public function delete_table(string $table_name): bool {
-        $sql = "DROP TABLE IF EXISTS $table_name";
+        $sql = "DROP TABLE IF EXISTS :table_name";
 
         try {
-            $this->execute($sql);
+            $this->execute($sql, [
+                ':table_name' => $table_name
+            ]);
             return true;
         } catch (PDOException $e) {
             throw new Exception('Error while deleting table: ' . $e->getMessage());
         }
     }
 
-    public function get_table_columns(string $table_name): array {
+    public function get_table_column_names(string $table_name): array {
         $sql = "SHOW COLUMNS FROM $table_name";
 
         try {
             $result = $this->query($sql);
+
             return $result->fetchAll(PDO::FETCH_COLUMN);
+        } catch (PDOException $e) {
+            throw new Exception('Error while getting table columns: ' . $e->getMessage());
+        }
+    }
+
+    public function get_table_columns_detailed(string $table_name): array {
+        $sql = "SHOW COLUMNS FROM :table_name";
+
+        try {
+            $result = $this->execute($sql, [
+                ':table_name' => $table_name
+            ]);
+
+            return $result->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            throw new Exception('Error while getting table columns: ' . $e->getMessage());
+        }
+    }
+
+    public function get_table_column_types(string $table_name): array {
+        $sql = "SELECT
+                COLUMN_NAME,
+                CASE
+                    WHEN DATA_TYPE = 'bigint' THEN 'BIGINT'
+                    WHEN DATA_TYPE = 'int' THEN 'INT'
+                    WHEN DATA_TYPE = 'varchar' THEN 'VARCHAR'
+                    ELSE DATA_TYPE
+                END AS DATA_TYPE
+            FROM
+                INFORMATION_SCHEMA.COLUMNS
+            WHERE
+                TABLE_NAME = :table_name
+        ";
+
+        try {
+            $result = $this->execute($sql, [
+                ':table_name' => $table_name
+            ]);
+
+            return $result->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
             throw new Exception('Error while getting table columns: ' . $e->getMessage());
         }
@@ -94,73 +137,56 @@ class Database {
 
         try {
             $result = $this->query($sql);
+
             $row = $result->fetch(PDO::FETCH_ASSOC);
+
             return $row['Column_name'];
         } catch (PDOException $e) {
             throw new Exception('Error while getting table primary key: ' . $e->getMessage());
         }
     }
 
-    public function select(string $table_name, array $query_info): array {
-        $columns = $query_info['columns'] ?? "*";
+    public function select(string $table_name, array $query_info = []): array {
+        $columns = isset($query_info['columns']) ? (is_array($query_info['columns']) ? implode(", ", $query_info['columns']) : $query_info['columns']) : "$table_name.*";
 
         $where = $query_info['where'] ?? [];
         $where_string = "";
 
-        $order_by = $query_info['order_by'] ?? [];
+        $order_by = $query_info['order_by'] ?? "";
         $order_by_string = "";
 
-        $group_by = $query_info['group_by'] ?? [];
+        $group_by = $query_info['group_by'] ?? "";
         $group_by_string = "";
 
         $join = $query_info['join'] ?? [];
         $join_string = "";
 
-        $limit = $query_info['limit'] ?? [];
+        $limit = $query_info['limit'] ?? "";
         $limit_string = "";
+
+        $offset = $query_info['offset'] ?? "";
+        $offset_string = "";
 
         $params = [];
 
         if (!empty($join)) {
-            if (str_contains($columns, ",")){
-                $columns_trimmed = str_replace(' ', '', $columns);
-                $columns_array = explode(",", $columns_trimmed);
-                $columns_list = [];
-                foreach ($columns_array as $column) {
-                    $columns_list[] = "$table_name.$column";
-                }
-                $columns = implode(", ", $columns_list);
-            }else {
-                $columns = "$table_name.*";
-            }
-
-            $join_strings = [];
-            $join_columns_string = [];
-
-            foreach ($join as $join_item) {
+            foreach ($join as $join_table_name => $join_item) {
                 if (!isset($join_item['type'])) $join_item['type'] = 'INNER';
 
-                if (!isset($join_item['columns'])) $join_item['columns'] = '*';
-
-                $join_item_table_name = $join_item['table_name'];
-                $join_item_columns = $join_item['columns'];
                 $join_item_type = strtoupper($join_item['type']);
-                $join_item_on = $join_item['on'];
-                $join_strings[] = " $join_item_type JOIN $join_item_table_name ON $join_item_on";
+                list($join_item_first, $join_item_operator, $join_item_second) = $join_item['on'];
+                $join_string .= " $join_item_type JOIN $join_table_name ON $join_item_first $join_item_operator $join_item_second";
 
-                if (str_contains($join_item_columns, ",")){
-                    $join_item_columns_trimmed = str_replace(' ', '', $join_item_columns);
-                    $join_item_columns_array = explode(",", $join_item_columns_trimmed);
-                    foreach ($join_item_columns_array as $join_item_column) {
-                        $join_columns_string[] = "$join_item_table_name.$join_item_column";
+                if (isset($join_item['columns'])) {
+                    $join_item_columns = $join_item['columns'];
+
+                    if (is_array($join_item_columns)) {
+                        $columns .= ", " . implode(", ", $join_item_columns);
+                    } else {
+                        $columns .= ", $join_item_columns";
                     }
-                }else {
-                    $join_columns_string[] = "$join_item_table_name.*";
                 }
             }
-
-            $join_string = implode(" ", $join_strings);
-            $columns .= ", " . implode(", ", $join_columns_string);
         }
 
         if (!empty($where)) {
@@ -181,13 +207,21 @@ class Database {
             }
         }
 
-        if (!empty($group_by)) $group_by_string = " GROUP BY $group_by";
+        if ($group_by !== "") $group_by_string = " GROUP BY $group_by";
 
-        if (!empty($order_by)) $order_by_string = " ORDER BY $order_by";
+        if (!empty($order_by)) {
+            $order_by_string = " ORDER BY ";
 
-        if (!empty($limit)) $limit_string = " LIMIT $limit";
+            $order_by_string .= implode(", ", array_map(function($subarray) {
+                return implode(" ", $subarray);
+            }, $order_by));
+        }
 
-        $sql = "SELECT $columns FROM $table_name" . (!empty($join) ? " $join_string" : "") . (!empty($where) ? " $where_string" : "") . (!empty($order_by) ? " $order_by_string" : "") . (!empty($group_by) ? " $group_by_string" : "") . (!empty($limit) ? " $limit_string" : "") . ";";
+        if ($limit !== "") $limit_string = " LIMIT $limit";
+
+        if ($offset !== "") $limit_string .= " OFFSET $offset";
+
+        $sql = "SELECT $columns FROM $table_name" . (!empty($join) ? " $join_string" : "") . (!empty($where) ? " $where_string" : "") . (!empty($order_by) ? " $order_by_string" : "") . (!empty($group_by) ? " $group_by_string" : "") . (!empty($limit) ? " $limit_string" : "") . (!empty($offset) ? " $offset_string" : "") . ";";
 
         // echo $sql;
         // var_dump($params);
@@ -200,14 +234,63 @@ class Database {
         }
     }
 
-    public function select_by_id(string $table_name, string $id, array $query_info): array {
+    public function select_one(string $table_name, array $query_info = []): array {
+        try {
+            $query_info['limit'] = 1;
+
+            $rows = $this->select($table_name, $query_info);
+
+            if (!empty($rows)) {
+                return $rows[0];
+            }
+
+            return $rows;
+        } catch (\Throwable $th) {
+            throw new Exception("Failed to select data from table $table_name: " . $th->getMessage());
+        }
+    }
+
+    public function select_by_id(string $table_name, string $id, array $query_info = []): array {
         try {
             if (isset($query_info['where'])) {
                 $query_info['where'][] = ['id', '=', $id];
             } else {
                 $query_info['where'] = [['id', '=', $id]];
             }
-            return $this->select($table_name, $query_info);
+
+            $query_info['limit'] = 1;
+
+            $rows = $this->select($table_name, $query_info);
+
+            if (!empty($rows)) {
+                return $rows[0];
+            }
+
+            return $rows;
+        } catch (\Throwable $th) {
+            throw new Exception("Failed to select data by id from table $table_name: " . $th->getMessage());
+        }
+    }
+
+    public function select_by_primary_key(string $table_name, string $id, array $query_info = []): array {
+        try {
+            $primary_key = $this->get_table_primary_key($table_name);
+
+            if (isset($query_info['where'])) {
+                $query_info['where'][] = [$primary_key, '=', $id];
+            } else {
+                $query_info['where'] = [[$primary_key, '=', $id]];
+            }
+
+            $query_info['limit'] = 1;
+
+            $rows = $this->select($table_name, $query_info);
+
+            if (!empty($rows)) {
+                return $rows[0];
+            }
+
+            return $rows;
         } catch (\Throwable $th) {
             throw new Exception("Failed to select data by id from table $table_name: " . $th->getMessage());
         }

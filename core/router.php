@@ -5,7 +5,7 @@ function router_generate_regex_pattern($url) {
         return "(?P<{$matches[1]}>\w+)";
     }, $url);
 
-    return "/^" . str_replace("/", "\/", $pattern) . "$/";
+    return '/^' . str_replace('/', '\/', $pattern) . '$/';
 }
 
 function router() {
@@ -22,7 +22,11 @@ function router() {
     $file_names = ["{$method}.php", "/{$method}.php"];
 
     foreach ($file_names as $file_name) {
-        $file_path = ROUTES_PATH . $_PATH . $file_name;
+        $file_path = realpath(PATHS['routes'] . $_PATH . $file_name);
+
+        if (!$file_path || strpos($file_path, realpath(PATHS['routes'])) !== 0) {
+            continue;
+        }
 
         if (file_exists($file_path) && is_file($file_path)) {
             return render($file_path);
@@ -30,13 +34,12 @@ function router() {
     }
 
     // Path Value
-
-    $dirs = array_filter(get_all_sub_dirs(ROUTES_PATH), function($path) {
+    $dirs = array_filter(get_all_sub_dirs(PATHS['routes']), function($path) {
         return preg_match('/\[[^\]]+\]/', $path);
     });
 
     $dirs = array_map(function($path) {
-        return str_replace(ROUTES_PATH, "", $path);
+        return str_replace(PATHS['routes'], "", $path);
     }, $dirs);
 
     $path_deep = substr_count($_PATH, "/");
@@ -50,7 +53,11 @@ function router() {
 
         if (preg_match($pattern, $_PATH, $matches)) {
             foreach ($file_names as $file_name) {
-                $file_path = ROUTES_PATH . $dir . $file_name;
+                $file_path = realpath(PATHS['routes'] . $dir . $file_name);
+
+                if (!$file_path || strpos($file_path, realpath(PATHS['routes'])) !== 0) {
+                    continue;
+                }
 
                 if (file_exists($file_path) && is_file($file_path)) {
                     $_PATH_VALUE = $matches;
@@ -62,8 +69,7 @@ function router() {
     }
 
     // Public
-
-    $public_files_paths = [PUBLIC_PATH . $_PATH, PUBLIC_PATH . $_PATH . "/index.html"];
+    $public_files_paths = [PATHS['public'] . $_PATH, PATHS['public'] . $_PATH . "/index.html"];
 
     foreach ($public_files_paths as $public_file_path) {
         if (file_exists($public_file_path) && is_file($public_file_path)) {
@@ -78,7 +84,7 @@ function router() {
     }
 
     // Not found
-    $not_found_file_path = ROUTES_PATH . "/404.php";
+    $not_found_file_path = PATHS['routes'] . '/404.php';
 
     if (file_exists($not_found_file_path)) {
         http_response_code(404);

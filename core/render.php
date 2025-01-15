@@ -15,33 +15,21 @@ function render(string $file_path) {
 
     $_CONTENT = ob_get_clean();
 
-    $content_type = get_response_header('Content-Type');
+    // $content_type = get_response_header('Content-Type');
 
-    if (isset($content_type) && str_contains($content_type, 'text/html')) {
+    // if (isset($content_type) && str_contains($content_type, 'text/html')) {
+    //     $_CONTENT = minify_html($_CONTENT);
+    // }
 
-        ob_start();
+    if (!is_null($_LAYOUT)) {
+        $layout_path = PATHS['layouts'] . "$_LAYOUT.php";
 
-        echo minify_html($_CONTENT);
+        if (file_exists($layout_path)) {
 
-        echo get_css();
+            if (isset($_LAYOUT_DATA)) extract($_LAYOUT_DATA);
 
-        echo get_js();
-
-        $_CONTENT = ob_get_clean();
-
-        if (isset($_LAYOUT)) {
-            $layout_path = LAYOUTS_PATH . $_LAYOUT . ".php";
-
-            if (file_exists($layout_path)) {
-                ob_start();
-
-                if (isset($_LAYOUT_DATA)) extract($_LAYOUT_DATA);
-
-                include_once $layout_path;
-            }
+            include_once $layout_path;
         }
-
-        ob_end_flush();
     } else {
         echo $_CONTENT;
     }

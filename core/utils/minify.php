@@ -27,7 +27,7 @@ function minify_css(string $css): string {
     $css = preg_replace('/\s*([{}|:;,])\s+/', '$1', $css);
     // Remove remaining spaces and line breaks
     $css = str_replace(array("\r\n", "\r", "\n", "\t", '  ', '    ', '    '), '',$css);
-    
+
     return $css;
 }
 
