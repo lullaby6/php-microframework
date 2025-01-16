@@ -18,3 +18,7 @@ define('PATHS', [
 ]);
 
 define('SHOW_ERRORS', false);
+
+include_once PATHS['utils'] . 'env.php';
+
+define('SECRET_KEY', get_env_or_default('SECRET_KEY', 'secret_key'));

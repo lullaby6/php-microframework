@@ -4,14 +4,20 @@ $_BODY = json_decode(file_get_contents('php://input'), true);
 
 $_METHOD = $_SERVER['REQUEST_METHOD'];
 
-$_HEADERS = getallheaders();
+$_HEADERS = apache_request_headers();
 
-$_FULL_URL = (empty($_SERVER['HTTPS']) ? 'http' : 'https') . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+$_PROTOCOL = empty($_SERVER['HTTPS']) ? 'http' : 'https';
 
-$_URL = $_SERVER['REQUEST_URI'];
+$_HOST = $_SERVER['HTTP_HOST'];
+
+$_URI = $_SERVER['REQUEST_URI'];
+
+$_BASE_URL = "{$_PROTOCOL}://{$_HOST}";
+
+$_FULL_URL = "{$_PROTOCOL}://{$_HOST}{$_URI}";
 
 $_PATH = parse_url($_FULL_URL)['path'];
 
-$_QUERY_STRING = (str_contains($_URL, '?')) ? explode('?', $_URL)[1] : '';
+$_QUERY_STRING = (str_contains($_URI, '?')) ? explode('?', $_URI)[1] : '';
 
 $_PATH_VALUE = array();

@@ -152,11 +152,11 @@ class Database {
         $where = $query_info['where'] ?? [];
         $where_string = "";
 
-        $order_by = $query_info['order_by'] ?? "";
-        $order_by_string = "";
-
         $group_by = $query_info['group_by'] ?? "";
         $group_by_string = "";
+
+        $order_by = $query_info['order_by'] ?? "";
+        $order_by_string = "";
 
         $join = $query_info['join'] ?? [];
         $join_string = "";
@@ -221,7 +221,7 @@ class Database {
 
         if ($offset !== "") $limit_string .= " OFFSET $offset";
 
-        $sql = "SELECT $columns FROM $table_name" . (!empty($join) ? " $join_string" : "") . (!empty($where) ? " $where_string" : "") . (!empty($order_by) ? " $order_by_string" : "") . (!empty($group_by) ? " $group_by_string" : "") . (!empty($limit) ? " $limit_string" : "") . (!empty($offset) ? " $offset_string" : "") . ";";
+        $sql = "SELECT $columns FROM $table_name" . (!empty($join) ? " $join_string" : "") . (!empty($where) ? " $where_string" : "") . (!empty($group_by) ? " $group_by_string" : "") . (!empty($order_by) ? " $order_by_string" : "") . (!empty($limit) ? " $limit_string" : "") . (!empty($offset) ? " $offset_string" : "") . ";";
 
         // echo $sql;
         // var_dump($params);
@@ -397,6 +397,18 @@ class Database {
 
             throw $th;
         }
+    }
+
+    public function start_transaction() {
+        $this->query("START TRANSACTION");
+    }
+
+    public function commit() {
+        $this->query("COMMIT");
+    }
+
+    public function rollback() {
+        $this->query("ROLLBACK");
     }
 
     public function close() {
